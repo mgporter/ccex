@@ -5,15 +5,15 @@ import { ChineseCharacter, ComponentStub } from "../Api/types";
 const TREE_CONTAINER_STYLE = `relative z-10`;
 const ROW_CONTAINER_STYLE = `flex min-w-[3rem] gap-6 justify-center`;
 const BRANCH_CONTAINER_STYLE = `flex flex-col gap-6`;
-const COMPONENT_CONTAINER_STYLE = "";
+const COMPONENT_CONTAINER_STYLE = "flex flex-col items-center";
 const COMPONENT_BOX_STYLE = "flex items-center justify-center text-[2rem] border-2 size-[4rem] shadow-lg select-none cursor-pointer";
 const COMPONENT_PINYIN_STYLE = "text-lg text-center";
 const CANVAS_STYLE = "absolute z-5 inset-0 size-full";
 
 // Use these for colors and other mutually exclusive stylings
-const COMPONENT_BOX_DEFAULT_STYLE = "border-orange-400 bg-orange-50";
-const COMPONENT_BOX_INACTIVE_STYLE = "border-stone-400 bg-stone-100";
-const COMPONENT_BOX_ROOT_STYLE = "border-violet-500 bg-violet-50";
+const COMPONENT_BOX_DEFAULT_STYLE = "border-orange-400 bg-orange-50 hover:border-orange-500 hover:bg-orange-100 active:border-orange-700 active:bg-orange-300";
+const COMPONENT_BOX_INACTIVE_STYLE = "border-stone-400 bg-stone-100 hover:border-stone-500 hover:bg-stone-200 active:border-stone-700 active:bg-stone-400";
+const COMPONENT_BOX_ROOT_STYLE = "border-violet-500 bg-violet-50 hover:border-violet-600 hover:bg-violet-100 active:border-violet-800 active:bg-violet-300";
 // const COMPONENT_BOX_DERIVATIVE_STYLE = "";
 
 
@@ -212,11 +212,6 @@ function drawConnection(
   ctx.stroke();
 
 }
-
-
-
-
-
 
 
 

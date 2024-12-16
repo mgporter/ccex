@@ -4,7 +4,7 @@ import Navigator from "./Navigator";
 export default function App() {
 
   return (
-    <main className="w-full">
+    <main className="">
       <Navigator />
       <Explorer />
     </main>
