@@ -1,0 +1,1 @@
+export const CHINESE_CHARACTER_GET = "http://localhost:5048/char/";
