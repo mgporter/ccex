@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { CHINESE_CHARACTER_GET } from "../Api/endpoints";
-import { ChineseCharacter } from "../Api/types";
+import { CHINESE_CHARACTER_TREEMAP } from "../Api/endpoints";
+import { ChineseCharacterTreeMapDTO } from "../Api/types";
 import useFetch from "./UseFetch";
 
 export function filterChineseCharactersSearchParams(chars: string) {
@@ -10,9 +10,9 @@ export function filterChineseCharactersSearchParams(chars: string) {
   }).join("");
 }
 
-export default function useFetchChineseCharacters(chars: string | undefined | null) {
+export default function useFetchChineseCharacterTreeMaps(chars: string | undefined | null) {
 
-  const { loading, error, data, callFetch, abortFetch, setData } = useFetch<ChineseCharacter[]>();
+  const { loading, error, data, callFetch, abortFetch, setData } = useFetch<ChineseCharacterTreeMapDTO[]>();
 
   useEffect(() => {
     if (!chars) {
@@ -24,7 +24,7 @@ export default function useFetchChineseCharacters(chars: string | undefined | nu
 
     if (filteredChars.length === 0) return;
 
-    callFetch(CHINESE_CHARACTER_GET, filteredChars);
+    callFetch(CHINESE_CHARACTER_TREEMAP, filteredChars);
 
     return () => {
       abortFetch();
@@ -34,9 +34,9 @@ export default function useFetchChineseCharacters(chars: string | undefined | nu
 
 
   return {
-    loading,
-    error,
-    data
+    treemapsLoading: loading,
+    treemapsError: error,
+    treemapsData: data
   }
 
 }

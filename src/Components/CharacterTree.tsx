@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
-import { ChineseCharacter, ComponentStub } from "../Api/types";
+import { ChineseCharacterTreeMapDTO, ComponentStub } from "../Api/types";
 
 
 const TREE_CONTAINER_STYLE = `relative z-10`;
 const ROW_CONTAINER_STYLE = `flex min-w-[3rem] gap-6 justify-center`;
 const BRANCH_CONTAINER_STYLE = `flex flex-col gap-6`;
 const COMPONENT_CONTAINER_STYLE = "flex flex-col items-center";
-const COMPONENT_BOX_STYLE = "flex items-center justify-center text-[2rem] border-2 size-[4rem] shadow-lg select-none cursor-pointer";
+const COMPONENT_BOX_STYLE = "component-box flex items-center justify-center text-[2rem] border-2 size-[4rem] shadow-lg select-none cursor-pointer";
 const COMPONENT_PINYIN_STYLE = "text-lg text-center";
 const CANVAS_STYLE = "absolute z-5 inset-0 size-full";
 
@@ -26,7 +26,7 @@ interface ComponentWithChildren {
 
 const NOPARENT = "";
 
-function createComponentWithChildrenArray(chardata: ChineseCharacter) {
+function createComponentWithChildrenArray(chardata: ChineseCharacterTreeMapDTO) {
 
   const root: ComponentStub = {
     char: chardata.char,
@@ -66,10 +66,12 @@ function createBoxRecursive(componentIndex: number, components: ComponentWithChi
   const component = components[componentIndex].component;
   const children = components[componentIndex].children;
 
-  components[componentIndex].div = createCompBoxDiv(component);
+  const componentBox = createCompBoxDiv(component);
+
+  components[componentIndex].div = componentBox;
 
   const parentRow = createRowBoxDiv();
-  parentRow.appendChild(components[componentIndex].div);
+  parentRow.appendChild(componentBox);
 
   const branchBox = createbranchBoxDiv();
   branchBox.appendChild(parentRow);
@@ -94,25 +96,22 @@ function createCompBoxDiv(component: ComponentStub) {
 
   const parent = document.createElement("div");
   parent.className = COMPONENT_CONTAINER_STYLE;
-  parent.setAttribute("data-char", component.char);
   
-  const character = document.createElement("div");
-  const characterContent = document.createElement("p");
-  characterContent.textContent = component.char;
-  character.appendChild(characterContent);
+  const characterBox = document.createElement("div");
+  characterBox.setAttribute("data-char", component.char);
 
-  character.onclick = () => {
-    console.log("clicked on " + component.char);
-  }
+  const character = document.createElement("p");
+  character.textContent = component.char;
+  characterBox.appendChild(character);
 
   if (component.parent === NOPARENT) {
-    character.className = COMPONENT_BOX_STYLE + " " + COMPONENT_BOX_ROOT_STYLE;
+    characterBox.className = COMPONENT_BOX_STYLE + " " + COMPONENT_BOX_ROOT_STYLE;
   } else {
 
     if (component.frequency > 10) {
-      character.className = COMPONENT_BOX_STYLE + " " + COMPONENT_BOX_DEFAULT_STYLE;
+      characterBox.className = COMPONENT_BOX_STYLE + " " + COMPONENT_BOX_DEFAULT_STYLE;
     } else {
-      character.className = COMPONENT_BOX_STYLE + " " + COMPONENT_BOX_INACTIVE_STYLE;
+      characterBox.className = COMPONENT_BOX_STYLE + " " + COMPONENT_BOX_INACTIVE_STYLE;
     }
 
   }
@@ -121,7 +120,7 @@ function createCompBoxDiv(component: ComponentStub) {
   pinyin.textContent = component.pinyin.join(", ");
   pinyin.className = COMPONENT_PINYIN_STYLE;
 
-  parent.append(character, pinyin);
+  parent.append(characterBox, pinyin);
   
   return parent;
 }
@@ -218,7 +217,7 @@ function drawConnection(
 
 
 export interface CharacterTreeProps {
-  chineseCharacter: ChineseCharacter;
+  chineseCharacter: ChineseCharacterTreeMapDTO;
 }
 
 export default function CharacterTree({ chineseCharacter }: CharacterTreeProps) {
@@ -265,6 +264,10 @@ export default function CharacterTree({ chineseCharacter }: CharacterTreeProps) 
   }, [components])
 
   return (
-    <div id="tree" data-rootchar={chineseCharacter.char} ref={containerRef} className="relative" />
+      <div id="tree" data-rootchar={chineseCharacter.char} ref={containerRef} className="relative">
+        {/* <div className="absolute bottom-4">
+          {chineseCharacter.derivatives.map(d => d.char).join(" ")}
+        </div> */}
+      </div>
   )
 };

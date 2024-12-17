@@ -39,6 +39,15 @@ export interface ChineseCharacterBasicDTO {
   frequency: number,
 }
 
+export interface ChineseCharacterTreeMapDTO {
+  id: number,
+  char: string,
+  components: ComponentStub[],
+  derivatives: DerivativeStub[],
+  primaryPinyin: string[],
+  frequency: number,
+}
+
 export interface Pinyin {
   id: number,
   syllable: string,

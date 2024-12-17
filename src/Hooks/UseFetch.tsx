@@ -49,12 +49,19 @@ export default function useFetch<T>() {
     setData(newData);
   }, []);
 
+  const reset = useCallback(() => {
+    setLoading(false);
+    setError(null);
+    setData(null);
+  }, []);
+
   return {
     loading,
     error,
     data,
     callFetch,
     abortFetch,
-    setData: setDataControlled
+    setData: setDataControlled,
+    reset
   }
 }
