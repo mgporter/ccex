@@ -1,107 +1,105 @@
-import { Button, Description, Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
 import useFetchChineseCharacterDetails from "../Hooks/UseFetchChineseCharacterDetails";
 import { ChineseCharacter, TradCharacterStub } from "../Api/types";
 import { useRef } from "react";
 import useScrollbarIsVisible from "../Hooks/UseScrollbarIsVisible";
+import CloseButton from "./CloseButton";
+import { CharacterDetailsDataInfo } from "./CharacterDetailsDialogContainer";
 
-interface CharacterDetailsDialogProps {
+interface CharacterDetailsDialogAndInlineProps {
   isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
   fetchDetailsHook: ReturnType<typeof useFetchChineseCharacterDetails>;
+  info: CharacterDetailsDataInfo;
 }
 
-export default function CharacterDetailsDialog({ isOpenState: [isOpen, setIsOpen], fetchDetailsHook }: CharacterDetailsDialogProps) {
+export default function CharacterDetailsDialog({ isOpenState, fetchDetailsHook, info }: CharacterDetailsDialogAndInlineProps) {
 
   const { detailsLoading, detailsError, detailsData, char } = fetchDetailsHook;
   const contentRef = useRef<HTMLDivElement | null>(null); // nullable, since the content div is conditionally rendered
   const scrollbarIsVisible = useScrollbarIsVisible(contentRef, detailsData);
 
-  let 
-    hasPrimaryPinyin = false,
-    hasSecondaryPinyin = false, 
-    hasTraditional = false,
-    frequencyMeterUrl = "",
-    hasTradDescriptions = false,
-    hasComponents = false,
-    hasDerivatives = false,
-    hasVariants = false;
-
-  if (detailsData) {
-    hasPrimaryPinyin = detailsData.primaryPinyin.length > 0;
-    hasSecondaryPinyin = detailsData.secondaryPinyin.length > 0;
-    hasTraditional = detailsData.tradChars.length > 0;
-    hasTradDescriptions = hasTraditional && detailsData.tradChars[0].description != null;
-
-    const freqSection = detailsData.frequency === 100 ? 9 : Math.floor(detailsData.frequency / 10);
-    frequencyMeterUrl = `/frequency-meter/freq${freqSection}0.png`;
-
-    hasComponents = detailsData.components.length > 0;
-    hasDerivatives = detailsData.derivatives.length > 0;
-    hasVariants = detailsData.variants.length > 0;
-  }
-
-
   return (
-    <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-[2000]">
-      <DialogBackdrop className="fixed inset-0 bg-black/30" />
-      <div className="fixed inset-0 flex w-screen items-center justify-center p-4
-        lg:p-0">
-        <DialogPanel className="character-details-dialog gap-4 relative min-w-[500px] min-h-[300px] max-w-[80%]
-          p-2 bg-stone-100 rounded-lg border border-gray-500
-          lg:min-w-min lg:w-full lg:max-w-full lg:min-h-min">
+    <div className="character-details-dialog gap-4 p-2">
+      <LargeCharDisplayWidget char={char} size={128} styles="absolute top-[-20px] left-[-20px]" />
 
-          <LargeCharDisplayWidget char={char} />
+      <CloseButton callback={() => isOpenState[1](false)} styles={`absolute top-2 px-[6px] ${scrollbarIsVisible ? "right-6" : "right-2"}`} />
 
-          <Button 
-            className={`absolute top-2 px-[6px] text-2xl text-red-700/60 select-none cursor-pointer
-              border border-transparent
-              ${scrollbarIsVisible ? "right-6" : "right-2"}
-              hover:text-red-700/80 hover:border-gray-500 rounded-full
-              active:text-black active:bg-red-700/50`}
-            onClick={() => setIsOpen(false)}>
-            ✖
-          </Button>
+      {detailsLoading && (
+        <div className="content mt-24 italic max-w-[400px] text-center">Loading...</div>
+      )}
 
-          {detailsLoading && (
-            <div className="content mt-24 italic max-w-[400px] text-center">Loading...</div>
-          )}
+      {detailsError && (
+        <div className="content mt-24 italic max-w-[400px] text-center">There was an error loading character data.</div>
+      )}
 
-          {detailsError && (
-            <div className="content mt-24 italic max-w-[400px] text-center">There was an error loading character data.</div>
-          )}
+      {detailsData && 
+        <>
+          <div ref={contentRef} className="content max-h-[80vh] overflow-y-auto p-2 pb-6">
 
-          {detailsData && 
-            <>
-              <div ref={contentRef} className="content max-h-[80vh] overflow-y-auto p-2 pb-6
-                lg:max-h-max">
+            <PinyinWidget 
+              data={detailsData}
+              info={info}
+            />
 
-                <PinyinWidget 
-                  data={detailsData}
-                  hasPrimaryPinyin={hasPrimaryPinyin}
-                  hasSecondaryPinyin={hasSecondaryPinyin}
-                />
+            <MainContentWidget 
+              data={detailsData}
+              info={info}
+            />
 
-                <MainContentWidget 
-                  data={detailsData}
-                  hasTradDescriptions={hasTradDescriptions}
-                  hasComponents={hasComponents}
-                  hasVariants={hasVariants}
-                  hasDerivatives={hasDerivatives}
-                />
+          </div>
 
-              </div>
+          <div className="aside flex flex-col gap-6 pb-4">
+            <FrequencyWidget url={info.frequencyMeterUrl} frequency={detailsData.frequency} />
+            <TraditionalCharsWidget tradChars={detailsData.tradChars} info={info} />
+          </div>
 
-              <div className="aside flex flex-col gap-6 pb-4">
-                <FrequencyWidget url={frequencyMeterUrl} frequency={detailsData.frequency} />
-                <TraditionalCharsWidget tradChars={detailsData.tradChars} hasTraditional={hasTraditional} />
-              </div>
-
-            </>
-          }
-        </DialogPanel>
-      </div>
-    </Dialog>
+        </>
+      }
+    </div>
   )
 }
+
+export function CharacterDetailsInline({isOpenState, fetchDetailsHook, info}: CharacterDetailsDialogAndInlineProps) {
+
+  const { detailsLoading, detailsError, detailsData, char } = fetchDetailsHook;
+  const isOpen = isOpenState[0];
+
+  return (
+    <div className={`character-details-inline flex flex-col pt-36 p-2 bg-slate-100 border-y border-slate-400 ${isOpen ? "" : "hidden"}`}>
+      <div className="flex gap-4 justify-evenly items-center">
+        <div className="flex flex-col items-center">
+          <LargeCharDisplayWidget char={char} size={96} />
+          {detailsData && <PinyinWidget data={detailsData} info={info} styles="text-center mt-2" />}
+        </div>
+        {detailsData && 
+          <>
+            <FrequencyWidget url={info.frequencyMeterUrl} frequency={detailsData.frequency} />
+            <TraditionalCharsWidget tradChars={detailsData.tradChars} info={info} />       
+          </>}
+      </div>
+
+
+      {detailsLoading && (
+        <div className="content italic max-w-[400px] text-center">Loading...</div>
+      )}
+
+      {detailsError && (
+        <div className="content italic max-w-[400px] text-center">There was an error loading character data.</div>
+      )}
+
+      {detailsData && 
+        <MainContentWidget 
+          data={detailsData}
+          info={info}
+        />
+      }
+
+      <CloseButton callback={() => isOpenState[1](false)} styles={`w-full mt-12 mb-4 bg-stone-50 h-12 border-gray-400`} />
+
+    </div>
+  )
+}
+
+
 
 function FrequencyWidget({url, frequency}: {url: string, frequency: number}) {
   return (
@@ -117,13 +115,10 @@ function FrequencyWidget({url, frequency}: {url: string, frequency: number}) {
 
 interface MainContentProps {
   data: ChineseCharacter;
-  hasTradDescriptions: boolean;
-  hasComponents: boolean;
-  hasVariants: boolean;
-  hasDerivatives: boolean;
+  info: CharacterDetailsDataInfo;
 }
 
-function MainContentWidget({data, hasTradDescriptions, hasComponents, hasVariants, hasDerivatives}: MainContentProps) {
+function MainContentWidget({data, info}: MainContentProps) {
   return (
     <>
       <div className="mb-2 mt-6 font-semibold">
@@ -134,7 +129,7 @@ function MainContentWidget({data, hasTradDescriptions, hasComponents, hasVariant
       
       <p className="mb-4 ml-4">{data.description}</p>
 
-      {hasTradDescriptions && (
+      {info.hasTradDescriptions && (
         <div className="mb-4">
           <h4 className="font-semibold mb-2">This character is also the combination of traditional characters with different meanings:</h4>
           {data.tradChars.map(c => (
@@ -143,19 +138,19 @@ function MainContentWidget({data, hasTradDescriptions, hasComponents, hasVariant
         </div>
       )}
 
-      <p><span className="font-semibold">Components: </span>{hasComponents ? data.components.map(c => c.char).join(", ") : <span className="italic">no components</span>}</p>
-      {hasVariants && <p><span className="font-semibold">Variants: </span>{data.variants.map(c => c.char).join(", ")}</p>}
-      <p><span className="font-semibold">Derivative characters: </span>{hasDerivatives ? data.derivatives.map(c => c.char).join(", ") : <span className="italic">no derivatives</span>}</p>
+      <p><span className="font-semibold">Components: </span>{info.hasComponents ? data.components.map(c => c.char).join(", ") : <span className="italic">no components</span>}</p>
+      {info.hasVariants && <p><span className="font-semibold">Variants: </span>{data.variants.map(c => c.char).join(", ")}</p>}
+      <p><span className="font-semibold">Derivative characters: </span>{info.hasDerivatives ? data.derivatives.map(c => c.char).join(", ") : <span className="italic">no derivatives</span>}</p>
     </>
   )
 }
 
-function TraditionalCharsWidget({tradChars, hasTraditional}: {tradChars: TradCharacterStub[], hasTraditional: boolean}) {
+function TraditionalCharsWidget({tradChars, info}: {tradChars: TradCharacterStub[], info: CharacterDetailsDataInfo;}) {
   return (
     <div className="flex flex-col gap-2 items-center">
       <p className="">Traditional</p>
       <div className="flex flex-wrap gap-3 justify-center">
-        {hasTraditional ? (
+        {info.hasTraditional ? (
           <>
             {tradChars.map(c => <TradCharacterStubBox key={c.char} char={c} />)}
           </>
@@ -180,25 +175,29 @@ function TradCharacterStubBox({char}: {char: TradCharacterStub}) {
 
 interface PinyinWidgetProps {
   data: ChineseCharacter;
-  hasPrimaryPinyin: boolean;
-  hasSecondaryPinyin: boolean;
+  info: CharacterDetailsDataInfo;
+  styles?: string;
 }
 
-function PinyinWidget({data, hasPrimaryPinyin, hasSecondaryPinyin}: PinyinWidgetProps) {
+function PinyinWidget({data, info, styles}: PinyinWidgetProps) {
   return (
-    <h2 className="text-3xl font-bold mb-1">
-      {hasPrimaryPinyin ? data.primaryPinyin.join(", ") : <span className="italic font-normal">No pronunciation</span>} 
-      {hasSecondaryPinyin && ` (also ${data.secondaryPinyin.join(", ")})`}
+    <h2 className={"text-3xl font-bold mb-1 " + styles}>
+      {info.hasPrimaryPinyin ? data.primaryPinyin.join(", ") : <span className="italic font-normal">No pronunciation</span>} 
+      {info.hasSecondaryPinyin && ` (also ${data.secondaryPinyin.join(", ")})`}
     </h2>  
   )
 }
 
-function LargeCharDisplayWidget({char}:{char: string}) {
+function LargeCharDisplayWidget({ char, styles, size }:{char: string, size:number, styles?: string}) {
   return (
-    <div className="absolute size-32 top-[-20px] left-[-20px] flex justify-center items-center pb-[8px]
-      bg-amber-500 bg-[url('/character-background.jpg')] bg-contain border border-orange-600 shadow-lg
-        text-[4.6rem] rounded-sm
-        md:static"
+    <div className={"flex justify-center items-center pb-[0%] \
+      bg-amber-500 bg-[url('/character-background.jpg')] bg-contain border border-orange-600 shadow-lg \
+        rounded-sm " + styles}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        fontSize: `${size / 27.8261}rem`,
+      }}
     >{char}</div>    
   )
 }

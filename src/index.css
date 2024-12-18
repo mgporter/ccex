@@ -80,12 +80,8 @@ main {
 }
 
 @media (max-width: 1024px) {
-  .character-details-dialog {
-    grid-template-areas: 
-      "cdd-as" 
-      "cdd-ct";
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
+  body {
+    min-width: inherit;
   }
 } 
 

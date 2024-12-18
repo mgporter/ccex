@@ -1,5 +1,5 @@
 import { Button, Input, Label } from "@headlessui/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { filterChineseCharactersSearchParams } from "../Hooks/UseFetchChineseCharacterTreeMaps";
 
@@ -30,7 +30,7 @@ export default function Navigator() {
       <div className="flex flex-col justify-center items-center w-80 px-6 py-2 gap-1
         bg-gradient-to-b from-blue-800 to-blue-500 ring-2 ring-blue-600
         pointer-events-auto rounded-b-2xl shadow-2xl border-x-2 border-b-2 border-blue-400
-        lg:w-full lg:rounded-none">
+        lg:w-full lg:rounded-none lg:shadow-none">
         <p className="text-stone-100/80">Enter Chinese characters:</p>
         <form onSubmit={handleSubmit} className="flex h-[2.4rem] w-full justify-center
           lg:h-[3.6rem]">

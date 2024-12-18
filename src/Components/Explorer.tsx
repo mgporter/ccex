@@ -2,10 +2,8 @@ import { useEffect, useState } from "react";
 import useFetchChineseCharacterTreeMaps from "../Hooks/UseFetchChineseCharacterTreeMaps";
 import CharacterTree from "./CharacterTree";
 import { useSearchParams } from "react-router";
-import CharacterDetailsModal from "./CharacterDetailsDialog";
 import useFetchChineseCharacterDetails from "../Hooks/UseFetchChineseCharacterDetails";
-import DialogModel from "./DialogModal";
-import useMatchMediaQuery from "../Hooks/UseMatchMediaQuery";
+import CharacterDetailsDialogContainer from "./CharacterDetailsDialogContainer";
 
 
 export default function Explorer() {
@@ -14,12 +12,13 @@ export default function Explorer() {
 
   const { treemapsLoading, treemapsError, treemapsData } = useFetchChineseCharacterTreeMaps(searchParams.get("chars"));
   const fetchDetailsHook = useFetchChineseCharacterDetails();
-  // const { detailsLoading, detailsError, detailsData, fetchCharData } = fetchDetailsHook;
 
   const dialogOpenState = useState(false);
-  const [dialogIsOpen, setDialogIsOpen] = dialogOpenState;
+  const setDialogIsOpen = dialogOpenState[1];
 
-  const isSmallScreen = useMatchMediaQuery("(max-width: 1024px)");
+  useEffect(() => {
+    setDialogIsOpen(false);
+  }, [setDialogIsOpen, searchParams])
 
   function componentClickHandler(e: React.MouseEvent) {
 
@@ -36,8 +35,9 @@ export default function Explorer() {
   }
 
   return (
-    <div id="explorer" className="flex items-center justify-center w-full min-h-[100vh]">
-      <CharacterDetailsModal isOpenState={dialogOpenState} fetchDetailsHook={fetchDetailsHook} />
+    <div id="explorer" className="flex items-center justify-center w-full min-h-[100vh]
+      lg:flex-col lg:min-h-min lg:max-w-full">
+      <CharacterDetailsDialogContainer isOpenState={dialogOpenState} fetchDetailsHook={fetchDetailsHook} />
       <div id="row" onClick={componentClickHandler} className="flex items-start justify-center gap-24 mx-[150px] mt-[210px] mb-[100px]
         lg:flex-col lg:justify-start lg:items-center lg:mx-0">
         {treemapsLoading && <div>Content is loading...</div>}
