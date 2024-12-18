@@ -69,6 +69,30 @@ main {
   min-height: inherit;
 }
 
-input {
 
+.character-details-dialog {
+  display: grid;
+  grid-template-areas: 
+    ". cdd-ct" 
+    "cdd-as cdd-ct";
+  grid-template-columns: 7rem auto;
+  grid-template-rows: 6rem auto;
+}
+
+@media (max-width: 1024px) {
+  .character-details-dialog {
+    grid-template-areas: 
+      "cdd-as" 
+      "cdd-ct";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+} 
+
+.character-details-dialog .content {
+  grid-area: cdd-ct;
+}
+
+.character-details-dialog .aside {
+  grid-area: cdd-as;
 }

@@ -3,7 +3,7 @@ import { ChineseCharacterTreeMapDTO, ComponentStub } from "../Api/types";
 
 
 const TREE_CONTAINER_STYLE = `relative z-10`;
-const ROW_CONTAINER_STYLE = `flex min-w-[3rem] gap-6 justify-center`;
+const ROW_CONTAINER_STYLE = `flex min-w-[3rem] gap-6 justify-center lg:gap-2`;
 const BRANCH_CONTAINER_STYLE = `flex flex-col gap-6`;
 const COMPONENT_CONTAINER_STYLE = "flex flex-col items-center";
 const COMPONENT_BOX_STYLE = "component-box flex items-center justify-center text-[2rem] border-2 size-[4rem] shadow-lg select-none cursor-pointer";

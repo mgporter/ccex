@@ -4,7 +4,7 @@ import Navigator from "./Navigator";
 export default function App() {
 
   return (
-    <main className="">
+    <main className="relative">
       <Navigator />
       <Explorer />
     </main>
