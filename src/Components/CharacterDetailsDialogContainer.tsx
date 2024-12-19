@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import useFetchChineseCharacterDetails from "../Hooks/UseFetchChineseCharacterDetails";
 import useMatchMediaQuery from "../Hooks/UseMatchMediaQuery";
 import CharacterDetailsDialog, { CharacterDetailsInline } from "./CharacterDetailsDialog";

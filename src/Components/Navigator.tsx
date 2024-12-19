@@ -1,5 +1,5 @@
-import { Button, Input, Label } from "@headlessui/react";
-import { useEffect, useRef } from "react";
+import { Button, Input } from "@headlessui/react";
+import { useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { filterChineseCharactersSearchParams } from "../Hooks/UseFetchChineseCharacterTreeMaps";
 
