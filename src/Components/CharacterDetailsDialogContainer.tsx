@@ -13,7 +13,7 @@ export interface CharacterDetailsDataInfo {
   hasPrimaryPinyin: boolean;
   hasSecondaryPinyin: boolean; 
   hasTraditional: boolean;
-  frequencyMeterUrl: string;
+  frequencyMeterNumber: number;
   hasTradDescriptions: boolean;
   hasComponents: boolean;
   hasDerivatives: boolean;
@@ -34,7 +34,7 @@ export default function CharacterDetailsDialogContainer({isOpenState, fetchDetai
     hasPrimaryPinyin: false,
     hasSecondaryPinyin: false, 
     hasTraditional: false,
-    frequencyMeterUrl: "",
+    frequencyMeterNumber: 0,
     hasTradDescriptions: false,
     hasComponents: false,
     hasDerivatives: false,
@@ -48,10 +48,7 @@ export default function CharacterDetailsDialogContainer({isOpenState, fetchDetai
     info.hasSecondaryPinyin = data.secondaryPinyin.length > 0;
     info.hasTraditional = data.tradChars.length > 0;
     info.hasTradDescriptions = info.hasTraditional && data.tradChars[0].description != null;
-
-    const freqSection = data.frequency === 100 ? 9 : Math.floor(data.frequency / 10);
-    info.frequencyMeterUrl = `/frequency-meter/freq${freqSection}0.png`;
-
+    info.frequencyMeterNumber = data.frequency === 100 ? 9 : Math.floor(data.frequency / 10);
     info.hasComponents = data.components.length > 0;
     info.hasDerivatives = data.derivatives.length > 0;
     info.hasVariants = data.variants.length > 0;

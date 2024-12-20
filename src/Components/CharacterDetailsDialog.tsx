@@ -5,6 +5,30 @@ import useScrollbarIsVisible from "../Hooks/UseScrollbarIsVisible";
 import CloseButton from "./CloseButton";
 import { CharacterDetailsDataInfo } from "./CharacterDetailsDialogContainer";
 
+import freq00 from '/frequency-meter/freq00.png';
+import freq10 from '/frequency-meter/freq10.png';
+import freq20 from '/frequency-meter/freq20.png';
+import freq30 from '/frequency-meter/freq30.png';
+import freq40 from '/frequency-meter/freq40.png';
+import freq50 from '/frequency-meter/freq50.png';
+import freq60 from '/frequency-meter/freq60.png';
+import freq70 from '/frequency-meter/freq70.png';
+import freq80 from '/frequency-meter/freq80.png';
+import freq90 from '/frequency-meter/freq90.png';
+
+const frequencyMeterUrls: Record<number, string> = {
+  0: freq00,
+  1: freq10,
+  2: freq20,
+  3: freq30,
+  4: freq40,
+  5: freq50,
+  6: freq60,
+  7: freq70,
+  8: freq80,
+  9: freq90,
+};
+
 interface CharacterDetailsDialogAndInlineProps {
   isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
   fetchDetailsHook: ReturnType<typeof useFetchChineseCharacterDetails>;
@@ -48,7 +72,7 @@ export default function CharacterDetailsDialog({ isOpenState, fetchDetailsHook, 
           </div>
 
           <div className="aside flex flex-col gap-6 pb-4">
-            <FrequencyWidget url={info.frequencyMeterUrl} frequency={detailsData.frequency} />
+            <FrequencyWidget meterNumber={info.frequencyMeterNumber} frequency={detailsData.frequency} />
             <TraditionalCharsWidget tradChars={detailsData.tradChars} info={info} />
           </div>
 
@@ -64,7 +88,7 @@ export function CharacterDetailsInline({isOpenState, fetchDetailsHook, info}: Ch
   const isOpen = isOpenState[0];
 
   return (
-    <div className={`character-details-inline flex flex-col pt-36 p-2 bg-slate-100 border-y border-slate-400 ${isOpen ? "" : "hidden"}`}>
+    <div className={`character-details-inline flex flex-col pt-36 p-2 bg-slate-200 border-y border-slate-400 ${isOpen ? "" : "hidden"}`}>
       <div className="flex gap-4 justify-evenly items-center">
         <div className="flex flex-col items-center">
           <LargeCharDisplayWidget char={char} size={96} />
@@ -72,7 +96,7 @@ export function CharacterDetailsInline({isOpenState, fetchDetailsHook, info}: Ch
         </div>
         {detailsData && 
           <>
-            <FrequencyWidget url={info.frequencyMeterUrl} frequency={detailsData.frequency} />
+            <FrequencyWidget meterNumber={info.frequencyMeterNumber} frequency={detailsData.frequency} />
             <TraditionalCharsWidget tradChars={detailsData.tradChars} info={info} />       
           </>}
       </div>
@@ -93,7 +117,10 @@ export function CharacterDetailsInline({isOpenState, fetchDetailsHook, info}: Ch
         />
       }
 
-      <CloseButton callback={() => isOpenState[1](false)} styles={`w-full mt-12 mb-4 bg-stone-50 h-12 border-gray-400`} />
+      <CloseButton 
+        callback={() => isOpenState[1](false)} 
+        styles={`w-full mt-12 mb-4 bg-red-100 h-12 border-slate-500/50`} 
+      />
 
     </div>
   )
@@ -101,12 +128,12 @@ export function CharacterDetailsInline({isOpenState, fetchDetailsHook, info}: Ch
 
 
 
-function FrequencyWidget({url, frequency}: {url: string, frequency: number}) {
+function FrequencyWidget({meterNumber, frequency}: {meterNumber: number, frequency: number}) {
   return (
     <div className="flex flex-col items-center">
       <p className="mb-2">Frequency</p>
       <div className="relative mr-4">
-        <img src={url} className="w-[3rem]" />
+        <img src={frequencyMeterUrls[meterNumber]} className="w-[3rem]" />
         <p className="inline absolute left-8 bottom-0 text-3xl italic">{frequency}</p>
       </div>
     </div>
