@@ -15,14 +15,12 @@ export default function Navigator() {
 
     const chars = filterChineseCharactersSearchParams(value);
 
-    if (chars.length === 0 || chars === searchParams.get('chars')) return;
+    if (chars.length === 0) return;
 
-    if (chars.length > 0) {
-      setSearchParams({
-        ...Object.fromEntries(searchParams),
-        chars: filterChineseCharactersSearchParams(value)
-      });
-    }
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      chars: chars.join("")
+    });
   }
 
   return (

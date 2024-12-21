@@ -42,8 +42,8 @@ export default function Explorer() {
         lg:flex-col lg:justify-start lg:items-center lg:mx-0">
         {treemapsLoading && <div>Content is loading...</div>}
         {treemapsError && <div>Error loading character data: {treemapsError}</div>}
-        {treemapsData && treemapsData.map(cchar => (
-          <CharacterTree key={cchar.char} chineseCharacter={cchar} />
+        {treemapsData && treemapsData.map((cchar, i) => (
+          <CharacterTree key={`${cchar.char}-${i}`} chineseCharacter={cchar} />
         ))}
       </div>
     </div>

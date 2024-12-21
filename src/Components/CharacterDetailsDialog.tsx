@@ -40,12 +40,13 @@ export default function CharacterDetailsDialog({ isOpenState, fetchDetailsHook, 
   const { detailsLoading, detailsError, detailsData, char } = fetchDetailsHook;
   const contentRef = useRef<HTMLDivElement | null>(null); // nullable, since the content div is conditionally rendered
   const scrollbarIsVisible = useScrollbarIsVisible(contentRef, detailsData);
+  const setIsOpen = isOpenState[1];
 
   return (
     <div className="character-details-dialog gap-4 p-2">
       <LargeCharDisplayWidget char={char} size={128} styles="absolute top-[-20px] left-[-20px]" />
 
-      <CloseButton callback={() => isOpenState[1](false)} styles={`absolute top-2 px-[6px] ${scrollbarIsVisible ? "right-6" : "right-2"}`} />
+      <CloseButton callback={() => setIsOpen(false)} styles={`absolute top-2 px-[6px] ${scrollbarIsVisible ? "right-6" : "right-2"}`} />
 
       {detailsLoading && (
         <div className="content mt-24 italic max-w-[400px] text-center">Loading...</div>
@@ -85,7 +86,7 @@ export default function CharacterDetailsDialog({ isOpenState, fetchDetailsHook, 
 export function CharacterDetailsInline({isOpenState, fetchDetailsHook, info}: CharacterDetailsDialogAndInlineProps) {
 
   const { detailsLoading, detailsError, detailsData, char } = fetchDetailsHook;
-  const isOpen = isOpenState[0];
+  const [isOpen, setIsOpen] = isOpenState;
 
   return (
     <div className={`character-details-inline flex flex-col pt-36 p-2 bg-slate-200 border-y border-slate-400 ${isOpen ? "" : "hidden"}`}>
@@ -118,7 +119,7 @@ export function CharacterDetailsInline({isOpenState, fetchDetailsHook, info}: Ch
       }
 
       <CloseButton 
-        callback={() => isOpenState[1](false)} 
+        callback={() => setIsOpen(false)} 
         styles={`w-full mt-12 mb-4 bg-red-100 h-12 border-slate-500/50`} 
       />
 
