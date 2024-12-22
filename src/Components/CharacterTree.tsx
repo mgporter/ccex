@@ -55,6 +55,7 @@ function createComponentWithChildrenArray(chardata: ChineseCharacterTreeMapDTO) 
 
 }
 
+
 function createTreeDiv(components: ComponentWithChildren[]): HTMLDivElement {
   const treeDiv = createBoxRecursive(0, components);
   treeDiv.className = BRANCH_CONTAINER_STYLE + " " + TREE_CONTAINER_STYLE;
@@ -264,10 +265,6 @@ export default function CharacterTree({ chineseCharacter }: CharacterTreeProps) 
   }, [components])
 
   return (
-      <div id="tree" data-rootchar={chineseCharacter.char} ref={containerRef} className="relative">
-        {/* <div className="absolute bottom-4">
-          {chineseCharacter.derivatives.map(d => d.char).join(" ")}
-        </div> */}
-      </div>
+      <div id="tree" data-rootchar={chineseCharacter.char} ref={containerRef} className="relative" />
   )
 };
