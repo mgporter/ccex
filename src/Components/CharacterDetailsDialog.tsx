@@ -15,6 +15,7 @@ import freq60 from '/frequency-meter/freq60.png';
 import freq70 from '/frequency-meter/freq70.png';
 import freq80 from '/frequency-meter/freq80.png';
 import freq90 from '/frequency-meter/freq90.png';
+import { ccexDispatcher } from "../Utils/CCEXDispatcher";
 
 const frequencyMeterUrls: Record<number, string> = {
   0: freq00,
@@ -166,9 +167,19 @@ function MainContentWidget({data, info}: MainContentProps) {
         </div>
       )}
 
-      <p><span className="font-semibold">Components: </span>{info.hasComponents ? data.components.map(c => c.char).join(", ") : <span className="italic">no components</span>}</p>
-      {info.hasVariants && <p><span className="font-semibold">Variants: </span>{data.variants.map(c => c.char).join(", ")}</p>}
-      <p><span className="font-semibold">Derivative characters: </span>{info.hasDerivatives ? data.derivatives.map(c => c.char).join(", ") : <span className="italic">no derivatives</span>}</p>
+      <p>
+        <span className="font-semibold">Components: </span>
+        {info.hasComponents ? data.components.map(c => <CharacterWithDispatch key={c.char} char={c.char} />) : <span className="italic">no components</span>}
+      </p>
+
+      {info.hasVariants && <p>
+        <span className="font-semibold">Variants: </span>{data.variants.map(c => <CharacterWithDispatch key={c.char} char={c.char} />)}
+      </p>}
+
+      <p>
+        <span className="font-semibold">Derivative characters: </span>
+        {info.hasDerivatives ? data.derivatives.map(c => <CharacterWithDispatch key={c.char} char={c.char} />) : <span className="italic">no derivatives</span>}
+      </p>
     </>
   )
 }
@@ -227,5 +238,17 @@ function LargeCharDisplayWidget({ char, styles, size }:{char: string, size:numbe
         fontSize: `${size / 27.8261}rem`,
       }}
     >{char}</div>    
+  )
+}
+
+
+function CharacterWithDispatch({ char }: { char: string }) {
+  return (
+    <span
+      onClick={() => ccexDispatcher.dispatch("showCharDetails", char)}
+      className="cursor-pointer mx-1
+      hover:text-red-500">
+      {char}
+    </span>
   )
 }

@@ -10,6 +10,7 @@ export default function useFetch<T>() {
   const callFetch = useCallback(async (endpoint: string, path: string | undefined | null) => {
     setLoading(true);
     setError(null);
+    setData(null);
 
     controllerRef.current = new AbortController();
 

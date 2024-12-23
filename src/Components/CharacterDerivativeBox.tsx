@@ -28,7 +28,7 @@ export default function CharacterDerivativeBox({ chineseCharacter }: CharacterDe
   const reorderedCharacters = reorderBoxes(chineseCharacter.derivatives, maxPerRow);
 
   return (
-    <div className="self-end justify-self-center mb-4 grid grid-cols-4 gap-1"
+    <div className="self-end justify-self-center mb-6 grid grid-cols-4 gap-1"
       style={{ gridTemplateColumns: `repeat(${maxPerRow}, minmax(0, 1fr))`}}>
       {reorderedCharacters}
     </div>
@@ -37,7 +37,7 @@ export default function CharacterDerivativeBox({ chineseCharacter }: CharacterDe
 
 function DerivativeBox({ char }: {char?: string}) {
   return (
-    <div data-char={char} className="component-box flex items-center justify-center text-[1.2rem] border-2 size-[2.4rem] select-none cursor-pointer
+    <div data-char={char} className="component-box character-with-details flex items-center justify-center text-[1.2rem] border-2 size-[2.4rem] select-none cursor-pointer
       border-stone-400 bg-stone-100 active:border-stone-700 active:bg-stone-400
       opacity-50 hover:opacity-100"
       style={{ visibility: char ? "visible" : "hidden"}}>
