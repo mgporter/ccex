@@ -265,6 +265,7 @@ export default function CharacterTree({ chineseCharacter }: CharacterTreeProps) 
   }, [components])
 
   return (
-      <div id="tree" data-rootchar={chineseCharacter.char} ref={containerRef} className="relative" />
+      <div id="tree" data-rootchar={chineseCharacter.char} ref={containerRef} 
+        className="relative lg:mb-24 lg:first-of-type:mt-24" />
   )
 };

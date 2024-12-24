@@ -1,5 +1,5 @@
 import { Button, Input } from "@headlessui/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { filterChineseCharactersSearchParams } from "../Hooks/UseFetchChineseCharacterTreeMaps";
 
@@ -8,23 +8,33 @@ export default function Navigator() {
   const inputRef = useRef<HTMLInputElement>(null!);
   const [searchParams, setSearchParams] = useSearchParams();
 
+  useEffect(() => {
+    const charsParam = searchParams.get('chars');
+    if (charsParam && inputRef.current.value !== charsParam) {
+      inputRef.current.value = charsParam;
+    }
+
+  }, [searchParams])
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const value = inputRef.current.value;
 
-    const chars = filterChineseCharactersSearchParams(value);
+    const filteredChars = filterChineseCharactersSearchParams(value).join("");
 
-    if (chars.length === 0) return;
+    if (filteredChars.length === 0) return;
 
     setSearchParams({
       ...Object.fromEntries(searchParams),
-      chars: chars.join("")
+      chars: filteredChars
     });
+
   }
 
   return (
-    <div className="fixed z-[1000] flex justify-center top-0 left-0 w-full pointer-events-none">
+    <div className="fixed z-[1000] flex justify-center top-0 left-0 w-full pointer-events-none
+      lg:sticky ">
       <div className="flex flex-col justify-center items-center w-80 px-6 py-2 gap-1
         bg-gradient-to-b from-blue-800 to-blue-500 ring-2 ring-blue-600
         pointer-events-auto rounded-b-2xl shadow-2xl border-x-2 border-b-2 border-blue-400

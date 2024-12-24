@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import useFetchChineseCharacterDetails from "../Hooks/UseFetchChineseCharacterDetails";
-import useMatchMediaQuery from "../Hooks/UseMatchMediaQuery";
 import CharacterDetailsDialog, { CharacterDetailsInline } from "./CharacterDetailsDialog";
 import DialogModel from "./DialogModal";
+import { ChineseCharacterBasicDTO, ComponentStub, DerivativeStub } from "../Api/types";
 
 interface CharacterDetailsDialogProps {
   isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
   fetchDetailsHook: ReturnType<typeof useFetchChineseCharacterDetails>;
+  isSmallScreen: boolean;
 }
 
 export interface CharacterDetailsDataInfo {
@@ -20,9 +21,19 @@ export interface CharacterDetailsDataInfo {
   hasVariants: boolean;
 }
 
-export default function CharacterDetailsDialogContainer({isOpenState, fetchDetailsHook}: CharacterDetailsDialogProps) {
-  
-  const isSmallScreen = useMatchMediaQuery("(max-width: 1024px)");
+type ObjectWithChar = { char: string }
+
+function ensureUniqueChar<T extends ObjectWithChar>(arr: T[]): T[] {
+  const map = new Map<string, T>();
+
+  for (const obj of arr) {
+    map.set(obj.char, obj);
+  }
+
+  return [...map.values()];
+}
+
+export default function CharacterDetailsDialogContainer({isOpenState, fetchDetailsHook, isSmallScreen}: CharacterDetailsDialogProps) {
 
   useEffect(() => {
     if (isSmallScreen) {
@@ -52,6 +63,10 @@ export default function CharacterDetailsDialogContainer({isOpenState, fetchDetai
     info.hasComponents = data.components.length > 0;
     info.hasDerivatives = data.derivatives.length > 0;
     info.hasVariants = data.variants.length > 0;
+
+    data.components = ensureUniqueChar<ComponentStub>(data.components);
+    data.variants = ensureUniqueChar<ChineseCharacterBasicDTO>(data.variants);
+    data.derivatives = ensureUniqueChar<DerivativeStub>(data.derivatives);
   }
 
   if (isSmallScreen) {

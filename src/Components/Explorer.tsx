@@ -6,6 +6,8 @@ import useFetchChineseCharacterDetails from "../Hooks/UseFetchChineseCharacterDe
 import CharacterDetailsDialogContainer from "./CharacterDetailsDialogContainer";
 import CharacterDerivativeBox from "./CharacterDerivativeBox";
 import { ccexDispatcher } from "../Utils/CCEXDispatcher";
+import React from "react";
+import useMatchSmallScreenQuery from "../Hooks/UseMatchSmallScreenQuery";
 
 
 export default function Explorer() {
@@ -17,6 +19,9 @@ export default function Explorer() {
 
   const dialogOpenState = useState(false);
   const setDialogIsOpen = dialogOpenState[1];
+
+  const isSmallScreen = useMatchSmallScreenQuery();
+  const showDerivatives = true;
 
   useEffect(() => {
     setDialogIsOpen(false);
@@ -46,17 +51,26 @@ export default function Explorer() {
 
   }
 
+  // If the data is available, then:
+  //  for small screens, we need one row per character
+  //  for large screens, we only need one row for everything
+  //  if we want to show derivatives, we then need to double the number of rows
+  const templateRows = !treemapsData ? 0 : 
+    (showDerivatives ? 2 : 1) * (isSmallScreen ? treemapsData.length : 1)
+
   return (
     <div id="explorer" className="grid gap-x-24 px-[150px] pt-[210px] pb-[100px]
       content-start items-start justify-center
       w-full min-h-[100vh]
-      lg:flex-col lg:min-h-min lg:max-w-full"
-      style={{ gridTemplateColumns: `repeat(${treemapsData ? treemapsData.length : 1}, auto)` }}
+      lg:flex lg:flex-col lg:min-h-min lg:max-w-full lg:justify-start lg:items-center
+      lg:px-0 lg:pt-0"
+      style={{ gridTemplateRows: `repeat(${templateRows}, auto)`, gridAutoFlow: 'column' }}
       onClick={characterClickHandler}>
 
       <CharacterDetailsDialogContainer
         isOpenState={dialogOpenState} 
-        fetchDetailsHook={fetchDetailsHook} />
+        fetchDetailsHook={fetchDetailsHook}
+        isSmallScreen={isSmallScreen} />
 
       {treemapsLoading && <div>Content is loading...</div>}
       {treemapsError && <div>Error loading character data: {treemapsError}</div>}
@@ -64,22 +78,14 @@ export default function Explorer() {
       {treemapsData && (
         <>
           {treemapsData.map((cchar, i) => (
-            <CharacterDerivativeBox key={`${cchar.char}-${i}`} chineseCharacter={cchar} />
-          ))}
-          {treemapsData.map((cchar, i) => (
-            <CharacterTree key={`${cchar.char}-${i}`} chineseCharacter={cchar} />
+            <React.Fragment key={`${cchar.char}-${i}`}>
+              {showDerivatives && <CharacterDerivativeBox chineseCharacter={cchar} />}
+              <CharacterTree chineseCharacter={cchar} />
+            </React.Fragment>
           ))}
         </>
       )}
 
-      {/* <div id="row" onClick={componentClickHandler} className="flex items-start justify-center gap-24 mx-[150px] mt-[210px] mb-[100px]
-        lg:flex-col lg:justify-start lg:items-center lg:mx-0">
-        {treemapsLoading && <div>Content is loading...</div>}
-        {treemapsError && <div>Error loading character data: {treemapsError}</div>}
-        {treemapsData && treemapsData.map((cchar, i) => (
-          <CharacterTree key={`${cchar.char}-${i}`} chineseCharacter={cchar} />
-        ))}
-      </div> */}
     </div>
   )
 }

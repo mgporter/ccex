@@ -1,4 +1,4 @@
-import { Dispatcher } from "./dispatcher";
+import { Dispatcher } from "./Dispatcher";
 
 interface CCEXEventMap {
   showCharDetails: string;

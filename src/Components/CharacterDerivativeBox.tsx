@@ -13,7 +13,7 @@ function reorderBoxes(stubs: DerivativeStub[], maxPerRow: number) {
   for (let i = (rowCount - 1) * maxPerRow; i >= 0; i -= maxPerRow) {
     const slice = boxes.slice(i, i + maxPerRow);
     while (slice.length < maxPerRow) {
-      slice.push(<DerivativeBox />);
+      slice.push(<DerivativeBox key={slice.length} />);
     }
     newBoxRows.push(slice);
   }
@@ -28,8 +28,9 @@ export default function CharacterDerivativeBox({ chineseCharacter }: CharacterDe
   const reorderedCharacters = reorderBoxes(chineseCharacter.derivatives, maxPerRow);
 
   return (
-    <div className="self-end justify-self-center mb-6 grid grid-cols-4 gap-1"
-      style={{ gridTemplateColumns: `repeat(${maxPerRow}, minmax(0, 1fr))`}}>
+    <div className="self-end justify-self-center mb-6 grid grid-cols-4 gap-1
+      lg:gap-1 lg:self-auto lg:first-of-type:mt-24"
+      style={{ gridTemplateColumns: `repeat(${maxPerRow}, auto)`}}>
       {reorderedCharacters}
     </div>
   )

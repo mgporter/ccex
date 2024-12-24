@@ -82,6 +82,7 @@ main {
 @media (max-width: 1024px) {
   body {
     min-width: inherit;
+    width: 100%;
   }
 } 
 
@@ -91,4 +92,26 @@ main {
 
 .character-details-dialog .aside {
   grid-area: cdd-as;
+}
+
+.loading-pulse {
+  animation: loading-entrance 2s cubic-bezier(0.4, 0, 0.6, 1) 1s both, loading-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 3s infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+@keyframes loading-entrance {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
