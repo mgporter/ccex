@@ -3,17 +3,17 @@ import { ChineseCharacterTreeMapDTO, ComponentStub } from "../Api/types";
 
 
 const TREE_CONTAINER_STYLE = `relative z-10`;
-const ROW_CONTAINER_STYLE = `flex min-w-[3rem] gap-6 justify-center lg:gap-2`;
-const BRANCH_CONTAINER_STYLE = `flex flex-col gap-6`;
+const ROW_CONTAINER_STYLE = `component-row flex min-w-[3rem] gap-6 justify-center lg:gap-2`;
+const BRANCH_CONTAINER_STYLE = `component-branch flex flex-col gap-6`;
 const COMPONENT_CONTAINER_STYLE = "flex flex-col items-center";
-const COMPONENT_BOX_STYLE = "component-box character-with-details flex items-center justify-center text-[2rem] border-2 size-[4rem] shadow-lg select-none cursor-pointer";
+const COMPONENT_BOX_STYLE = "component-box character-with-details noto-serif-sc flex items-center justify-center text-[2rem] border-2 size-[4rem] shadow-lg select-none cursor-pointer";
 const COMPONENT_PINYIN_STYLE = "text-lg text-center";
 const CANVAS_STYLE = "absolute z-5 inset-0 size-full";
 
 // Use these for colors and other mutually exclusive stylings
 const COMPONENT_BOX_DEFAULT_STYLE = "border-orange-400 bg-orange-50 hover:border-orange-500 hover:bg-orange-100 active:border-orange-700 active:bg-orange-300";
 const COMPONENT_BOX_INACTIVE_STYLE = "border-stone-400 bg-stone-100 hover:border-stone-500 hover:bg-stone-200 active:border-stone-700 active:bg-stone-400";
-const COMPONENT_BOX_ROOT_STYLE = "border-violet-500 bg-violet-50 hover:border-violet-600 hover:bg-violet-100 active:border-violet-800 active:bg-violet-300";
+const COMPONENT_BOX_ROOT_STYLE = "component-root border-violet-500 bg-violet-50 hover:border-violet-600 hover:bg-violet-100 active:border-violet-800 active:bg-violet-300";
 // const COMPONENT_BOX_DERIVATIVE_STYLE = "";
 
 
@@ -230,6 +230,7 @@ export default function CharacterTree({ chineseCharacter }: CharacterTreeProps) 
   const components = createComponentWithChildrenArray(chineseCharacter);
 
   useEffect(() => {
+
     const treeDiv = createTreeDiv(components);
     const treeCanvas = createCanvas();
 
@@ -263,6 +264,24 @@ export default function CharacterTree({ chineseCharacter }: CharacterTreeProps) 
 
     }
   }, [components])
+
+  // useEffect(() => {
+  //   const rows = document.querySelectorAll(`[data-rootchar="${chineseCharacter.char}"] .component-row`);
+
+  //   for (const row of rows) {
+  //     (row as HTMLElement).style.gap = "0.1rem";
+  //     (row as HTMLElement).style.minWidth = "0.1rem";
+  //   }
+
+  //   const boxes = document.querySelectorAll(`[data-rootchar="${chineseCharacter.char}"] .component-box:not(.component-root)`);
+
+  //   for (const box of boxes) {
+  //     (box as HTMLElement).style.width = "3rem";
+  //     (box as HTMLElement).style.height = "3rem";
+  //     (box as HTMLElement).style.fontSize = "1.8rem";
+  //   }
+
+  // })
 
   return (
       <div id="tree" data-rootchar={chineseCharacter.char} ref={containerRef} 

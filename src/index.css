@@ -12,41 +12,33 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-  /* border: 1px solid #253341;
-  background-color: white;
-  -webkit-text-fill-color: white;
-  -webkit-box-shadow: 0 0 0px 1000px #253341 inset;
-  box-shadow: 0 0 0px 1000px #253341 inset;
-  transition: background-color 5000s ease-in-out 0s;
-  color: white; */
-  transition: background-color 5000s ease-in-out 0s;
-  -webkit-text-fill-color: black;
-  -webkit-text-stroke-color: black;
-  caret-color: black;
 
-  /* border: none;
-  background-color: white;
-  -webkit-text-fill-color: white;
-  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
-  box-shadow: 0 0 0px 1000px #ffffff inset;
+  /* transition: background-color 5000s ease-in-out 0s;
   -webkit-text-fill-color: black;
   -webkit-text-stroke-color: black;
-  -web
-  color: black; */
+  caret-color: black; */
+
 }
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Helvetica, Inter, system-ui, Avenir, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  color-scheme: light;
   color: rgba(0, 0, 0, 1);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.noto-serif-sc {
+  font-family: "Noto Serif SC", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
 
 body {

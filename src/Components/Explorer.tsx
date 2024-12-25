@@ -8,6 +8,7 @@ import CharacterDerivativeBox from "./CharacterDerivativeBox";
 import { ccexDispatcher } from "../Utils/CCEXDispatcher";
 import React from "react";
 import useMatchSmallScreenQuery from "../Hooks/UseMatchSmallScreenQuery";
+import { useCCEXStore } from "../Hooks/UseCCEXExplorerStore";
 
 
 export default function Explorer() {
@@ -21,7 +22,7 @@ export default function Explorer() {
   const setDialogIsOpen = dialogOpenState[1];
 
   const isSmallScreen = useMatchSmallScreenQuery();
-  const showDerivatives = true;
+  const { showDerivatives } = useCCEXStore();
 
   useEffect(() => {
     setDialogIsOpen(false);
@@ -29,7 +30,7 @@ export default function Explorer() {
 
   useEffect(() => {
     const unsubscribe = ccexDispatcher.subscribe("showCharDetails", (char: string) => {
-      fetchDetailsHook.fetchCharData(char);
+      fetchDetailsHook.fetchData(char);
       setDialogIsOpen(true);
     });
 
@@ -44,7 +45,7 @@ export default function Explorer() {
       const char = componentBox?.getAttribute("data-char");
 
       if (char) {
-        fetchDetailsHook.fetchCharData(char);
+        fetchDetailsHook.fetchData(char);
         setDialogIsOpen(true);
       }
     }

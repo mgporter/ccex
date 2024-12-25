@@ -3,6 +3,9 @@ import useFetchChineseCharacterDetails from "../Hooks/UseFetchChineseCharacterDe
 import CharacterDetailsDialog, { CharacterDetailsInline } from "./CharacterDetailsDialog";
 import DialogModel from "./DialogModal";
 import { ChineseCharacterBasicDTO, ComponentStub, DerivativeStub } from "../Api/types";
+import { createContext } from "react";
+
+export const CharacterDetailsContext = createContext<ReturnType<typeof useFetchChineseCharacterDetails>>(null!);
 
 interface CharacterDetailsDialogProps {
   isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
@@ -10,16 +13,16 @@ interface CharacterDetailsDialogProps {
   isSmallScreen: boolean;
 }
 
-export interface CharacterDetailsDataInfo {
-  hasPrimaryPinyin: boolean;
-  hasSecondaryPinyin: boolean; 
-  hasTraditional: boolean;
-  frequencyMeterNumber: number;
-  hasTradDescriptions: boolean;
-  hasComponents: boolean;
-  hasDerivatives: boolean;
-  hasVariants: boolean;
-}
+// export interface CharacterDetailsDataInfo {
+//   hasPrimaryPinyin: boolean;
+//   hasSecondaryPinyin: boolean; 
+//   hasTraditional: boolean;
+//   frequencyMeterNumber: number;
+//   hasTradDescriptions: boolean;
+//   hasComponents: boolean;
+//   hasDerivatives: boolean;
+//   hasVariants: boolean;
+// }
 
 type ObjectWithChar = { char: string }
 
@@ -41,43 +44,44 @@ export default function CharacterDetailsDialogContainer({isOpenState, fetchDetai
     }
   }, [fetchDetailsHook, isSmallScreen])
 
-  const info: CharacterDetailsDataInfo = { 
-    hasPrimaryPinyin: false,
-    hasSecondaryPinyin: false, 
-    hasTraditional: false,
-    frequencyMeterNumber: 0,
-    hasTradDescriptions: false,
-    hasComponents: false,
-    hasDerivatives: false,
-    hasVariants: false
-  }
+  // const info: CharacterDetailsDataInfo = { 
+  //   hasPrimaryPinyin: false,
+  //   hasSecondaryPinyin: false, 
+  //   hasTraditional: false,
+  //   frequencyMeterNumber: 0,
+  //   hasTradDescriptions: false,
+  //   hasComponents: false,
+  //   hasDerivatives: false,
+  //   hasVariants: false
+  // }
 
-  const data = fetchDetailsHook.detailsData;
+  const data = fetchDetailsHook.data;
 
   if (data) {
-    info.hasPrimaryPinyin = data.primaryPinyin.length > 0;
-    info.hasSecondaryPinyin = data.secondaryPinyin.length > 0;
-    info.hasTraditional = data.tradChars.length > 0;
-    info.hasTradDescriptions = info.hasTraditional && data.tradChars[0].description != null;
-    info.frequencyMeterNumber = data.frequency === 100 ? 9 : Math.floor(data.frequency / 10);
-    info.hasComponents = data.components.length > 0;
-    info.hasDerivatives = data.derivatives.length > 0;
-    info.hasVariants = data.variants.length > 0;
+    // info.hasPrimaryPinyin = data.primaryPinyin.length > 0;
+    // info.hasSecondaryPinyin = data.secondaryPinyin.length > 0;
+    // info.hasTraditional = data.tradChars.length > 0;
+    // info.hasTradDescriptions = info.hasTraditional && data.tradChars[0].description != null;
+    // info.frequencyMeterNumber = data.frequency === 100 ? 9 : Math.floor(data.frequency / 10);
+    // info.hasComponents = data.components.length > 0;
+    // info.hasDerivatives = data.derivatives.length > 0;
+    // info.hasVariants = data.variants.length > 0;
 
     data.components = ensureUniqueChar<ComponentStub>(data.components);
     data.variants = ensureUniqueChar<ChineseCharacterBasicDTO>(data.variants);
     data.derivatives = ensureUniqueChar<DerivativeStub>(data.derivatives);
   }
 
-  if (isSmallScreen) {
-    return (
-      <CharacterDetailsInline isOpenState={isOpenState} fetchDetailsHook={fetchDetailsHook} info={info} />
-    )
-  } else {
-    return (
-      <DialogModel isOpenState={isOpenState}>
-        <CharacterDetailsDialog isOpenState={isOpenState} fetchDetailsHook={fetchDetailsHook} info={info} />
-      </DialogModel>  
-    )
-  }
+  return (
+    <CharacterDetailsContext.Provider value={fetchDetailsHook}>
+      {isSmallScreen ? (
+        <CharacterDetailsInline isOpenState={isOpenState} />
+      ) : (
+        <DialogModel isOpenState={isOpenState}>
+          <CharacterDetailsDialog isOpenState={isOpenState} />
+        </DialogModel>  
+      )}
+    </CharacterDetailsContext.Provider>
+  )
+
 }

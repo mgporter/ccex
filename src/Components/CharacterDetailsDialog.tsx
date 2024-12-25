@@ -1,9 +1,8 @@
-import useFetchChineseCharacterDetails from "../Hooks/UseFetchChineseCharacterDetails";
-import { ChineseCharacter, TradCharacterStub } from "../Api/types";
-import { useRef } from "react";
+import { TradCharacterStub } from "../Api/types";
+import { useContext, useRef } from "react";
 import useScrollbarIsVisible from "../Hooks/UseScrollbarIsVisible";
 import CloseButton from "./CloseButton";
-import { CharacterDetailsDataInfo } from "./CharacterDetailsDialogContainer";
+import { CharacterDetailsContext } from "./CharacterDetailsDialogContainer";
 
 import freq00 from '/frequency-meter/freq00.png';
 import freq10 from '/frequency-meter/freq10.png';
@@ -30,106 +29,56 @@ const frequencyMeterUrls: Record<number, string> = {
   9: freq90,
 };
 
-interface CharacterDetailsDialogAndInlineProps {
+interface CharacterDetailsProps {
   isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
-  fetchDetailsHook: ReturnType<typeof useFetchChineseCharacterDetails>;
-  info: CharacterDetailsDataInfo;
 }
 
-export default function CharacterDetailsDialog({ isOpenState, fetchDetailsHook, info }: CharacterDetailsDialogAndInlineProps) {
+export default function CharacterDetailsDialog({ isOpenState }: CharacterDetailsProps) {
 
-  const { detailsError, detailsData, char } = fetchDetailsHook;
+  const { data } = useContext(CharacterDetailsContext);
   const contentRef = useRef<HTMLDivElement | null>(null); // nullable, since the content div is conditionally rendered
-  const scrollbarIsVisible = useScrollbarIsVisible(contentRef, detailsData);
+  const scrollbarIsVisible = useScrollbarIsVisible(contentRef, data);
   const setIsOpen = isOpenState[1];
 
   return (
     <div className="character-details-dialog gap-4 p-2">
-      <LargeCharDisplayWidget char={char} size={128} styles="absolute top-[-20px] left-[-20px]" />
+      <LargeCharDisplayWidget size={128} styles="absolute top-[-20px] left-[-20px]" />
 
       <CloseButton callback={() => setIsOpen(false)} styles={`absolute top-2 px-[6px] ${scrollbarIsVisible ? "right-6" : "right-2"}`} />
 
-      {detailsError && (
-        <div className="content mt-24 italic max-w-[400px] text-center">There was an error loading character data.</div>
-      )}
+      <div ref={contentRef} className="content max-h-[80vh] overflow-y-auto p-2 pb-6">
+        <PinyinWidget />
+        <MainContentWidget />
+      </div>
 
-      {!detailsError && 
-        <>
-          <div ref={contentRef} className="content max-h-[80vh] overflow-y-auto p-2 pb-6">
-
-            <PinyinWidget 
-              data={detailsData}
-              info={info}
-            />
-
-            <MainContentWidget 
-              data={detailsData}
-              info={info}
-            />
-
-          </div>
-
-          <div className="aside flex flex-col gap-6 pb-4">
-            <FrequencyWidget 
-              meterNumber={info.frequencyMeterNumber} 
-              data={detailsData} />
-            <TraditionalCharsWidget 
-              data={detailsData}
-              info={info} />
-          </div>
-
-        </>
-      }
+      <div className="aside flex flex-col gap-6 pb-4">
+        <FrequencyWidget />
+        <TraditionalCharsWidget />
+      </div>
     </div>
   )
 }
 
-export function CharacterDetailsInline({isOpenState, fetchDetailsHook, info}: CharacterDetailsDialogAndInlineProps) {
+export function CharacterDetailsInline({ isOpenState }: CharacterDetailsProps) {
 
-  const { detailsLoading, detailsError, detailsData, char } = fetchDetailsHook;
   const [isOpen, setIsOpen] = isOpenState;
 
   return (
-    <aside className={`character-details-inline flex flex-col px-2 py-8 bg-slate-200 border-y border-slate-400
+    <aside className={`character-details-inline flex flex-col w-full px-2 py-8 bg-slate-200 border-y border-slate-400
       ${isOpen ? "" : "hidden"}`}>
-      <div className="flex gap-4 justify-evenly items-center">
+      <div className="flex justify-evenly items-start">
 
         <div className="flex flex-col items-center">
-          <LargeCharDisplayWidget char={char} size={96} />
-          {detailsData && 
-            <PinyinWidget 
-              data={detailsData} 
-              info={info}
-              styles="text-center mt-2" />}
+          <LargeCharDisplayWidget size={96} />
+          <PinyinWidget styles="text-center mt-2" />
         </div>
 
-        {detailsData && 
-          <>
-            <FrequencyWidget 
-              meterNumber={info.frequencyMeterNumber} 
-              data={detailsData} />
-            <TraditionalCharsWidget 
-              data={detailsData}
-              info={info} />       
-          </>}
+        <FrequencyWidget styles="mt-4" />
+        <TraditionalCharsWidget styles="mt-4" />
 
       </div>
 
-
-      {detailsLoading && (
-        <div className="content italic max-w-[400px] text-center">Loading...</div>
-      )}
-
-      {detailsError && (
-        <div className="content italic max-w-[400px] text-center">There was an error loading character data.</div>
-      )}
-
-      {detailsData && 
-        <MainContentWidget 
-          data={detailsData}
-          info={info}
-        />
-      }
+      <MainContentWidget />
 
       <CloseButton 
         callback={() => setIsOpen(false)} 
@@ -141,33 +90,30 @@ export function CharacterDetailsInline({isOpenState, fetchDetailsHook, info}: Ch
 }
 
 
-interface FrequencyWidgetProps {
-  meterNumber: number;
-  data: ChineseCharacter | null;
-}
+function FrequencyWidget({ styles }: { styles?: string }) {
 
-function FrequencyWidget({meterNumber, data}: FrequencyWidgetProps) {
+  const { data, loading, info, notFound, error } = useContext(CharacterDetailsContext);
+
   return (
-    <div className="flex flex-col items-center">
+    <div className={"flex flex-col items-center " + styles}>
       <p className="mb-2">Frequency</p>
-      {data ? (
+      {loading && <div className="loading-pulse w-[5rem] h-[3.4rem] bg-gray-200 rounded-md" />}
+      {(notFound || error) && <div className="w-[5rem] h-[3.4rem]" />}
+      {data && (
         <div className="relative mr-4">
-          <img src={frequencyMeterUrls[meterNumber]} className="w-[3rem]" />
+          <img src={frequencyMeterUrls[info.frequencyMeterNumber]} className="w-[3rem]" />
           <p className="inline absolute left-8 bottom-0 text-3xl italic">{data.frequency}</p>
         </div>
-      ) : (
-        <div className="loading-pulse w-[5rem] h-[3.4rem] bg-gray-200 rounded-md" />
       )}
     </div>
   )
 }
 
-interface MainContentProps {
-  data: ChineseCharacter | null;
-  info: CharacterDetailsDataInfo;
-}
 
-function MainContentWidget({ data, info }: MainContentProps) {
+function MainContentWidget() {
+
+  const { data, loading, info, error, notFound } = useContext(CharacterDetailsContext);
+
   if (data) {
     return (
       <>
@@ -203,7 +149,7 @@ function MainContentWidget({ data, info }: MainContentProps) {
         </p>
       </>
     )
-  } else {
+  } else if (loading) {
     return (
       <div className="loading-pulse">
         <div className="mb-2 mt-6 h-[1.8rem] w-[8rem] bg-gray-200 rounded-md" />    
@@ -212,19 +158,27 @@ function MainContentWidget({ data, info }: MainContentProps) {
         <div className="h-[1.4rem] w-[60%] bg-gray-200 rounded-md" />    
       </div>      
     )
+  } else {
+    return (
+      <div className="mt-24 text-center">
+        {notFound && "Data for this character not found."}
+        {error && `There was an error loading character data.`}
+      </div>
+    )
   }
 }
 
-interface TraditionalCharsWidgetProps {
-  data: ChineseCharacter | null;
-  info: CharacterDetailsDataInfo;
-}
 
-function TraditionalCharsWidget({ data, info }: TraditionalCharsWidgetProps) {
+function TraditionalCharsWidget({ styles }: { styles?: string }) {
+
+  const { data, loading, info, error, notFound } = useContext(CharacterDetailsContext);
+
   return (
-    <div className="flex flex-col gap-2 items-center">
+    <div className={"flex flex-col gap-2 items-center " + styles}>
       <p className="">Traditional</p>
-      {data ? (
+      {loading && <div className="h-[3.6rem] w-[4rem] bg-gray-200 rounded-md"></div>}
+      {(notFound || error) && <div className="h-[3.6rem] w-[4rem]"></div>}
+      {data && (
         <div className="flex flex-wrap gap-3 justify-center">
         {info.hasTraditional ? (
           <>
@@ -234,14 +188,12 @@ function TraditionalCharsWidget({ data, info }: TraditionalCharsWidgetProps) {
             <p className="italic text-center text-sm">Same as simplified</p>
           )} 
       </div>
-      ) : (
-        <div className="h-[3.6rem] w-[4rem] bg-gray-200 rounded-md"></div>
       )}
     </div>
   )
 }
 
-function TradCharacterStubBox({char}: {char: TradCharacterStub}) {
+function TradCharacterStubBox({ char }: { char: TradCharacterStub }) {
 
   return (
     <div className="flex flex-col items-center">
@@ -252,36 +204,38 @@ function TradCharacterStubBox({char}: {char: TradCharacterStub}) {
   )
 }
 
-interface PinyinWidgetProps {
-  data: ChineseCharacter | null;
-  info: CharacterDetailsDataInfo;
-  styles?: string;
-}
 
-function PinyinWidget({data, info, styles}: PinyinWidgetProps) {
+function PinyinWidget({ styles }: { styles?: string }) {
+
+  const { data, loading, info, error, notFound } = useContext(CharacterDetailsContext);
 
   return (
-    data ? (
-      <h2 className={"text-3xl font-bold mb-1 " + styles}>
-        {info.hasPrimaryPinyin ? data.primaryPinyin.join(", ") : <span className="italic font-normal">No pronunciation</span>} 
-        {info.hasSecondaryPinyin && ` (also ${data.secondaryPinyin.join(", ")})`}
-      </h2>  
-    ) : (
-      <div className="h-[2.2rem] w-[6rem] bg-gray-200 rounded-md"></div>
-    )
+    <>
+      {loading && <div className="h-[2.2rem] w-[6rem] bg-gray-200 rounded-md"></div>}
+      {(error || notFound) && <div className="h-[2.2rem] w-[6rem]"></div>}
+      {data && (
+        <h2 className={"text-3xl font-bold mb-1 " + styles}>
+          {info.hasPrimaryPinyin ? data.primaryPinyin.join(", ") : <span className="italic font-normal text-xl">No pronunciation</span>} 
+          {info.hasSecondaryPinyin && ` (also ${data.secondaryPinyin.join(", ")})`}
+        </h2>  
+      )}
+    </>
   )
 }
 
 
-function LargeCharDisplayWidget({ char, styles, size }:{char: string, size:number, styles?: string}) {
+function LargeCharDisplayWidget({ size, styles }: { size:number, styles?: string }) {
+
+  const { char } = useContext(CharacterDetailsContext);
+  
   return (
-    <div className={"flex justify-center items-center pb-[0%] \
+    <div className={"flex justify-center items-center pb-[0%] noto-serif-sc \
       bg-amber-500 bg-[url('/character-background.jpg')] bg-contain border border-orange-600 shadow-lg \
         rounded-sm " + styles}
       style={{
         width: `${size}px`,
         height: `${size}px`,
-        fontSize: `${size / 27.8261}rem`,
+        fontSize: `${size / 25}rem`,
       }}
     >{char}</div>    
   )
@@ -292,7 +246,7 @@ function CharacterWithDispatch({ char }: { char: string }) {
   return (
     <span
       onClick={() => ccexDispatcher.dispatch("showCharDetails", char)}
-      className="cursor-pointer mx-1
+      className="cursor-pointer mx-1 noto-serif-sc text-lg
       hover:text-red-500">
       {char}
     </span>
