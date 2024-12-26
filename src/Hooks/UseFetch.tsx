@@ -5,7 +5,7 @@ export default function useFetch<T>() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<T | null>(null);
-  const controllerRef = useRef<AbortController>();
+  const controllerRef = useRef<AbortController>(new AbortController());
 
   const callFetch = useCallback(async (endpoint: string, path: string | undefined | null) => {
     setLoading(true);
@@ -44,7 +44,7 @@ export default function useFetch<T>() {
     setError(null);
   }, []);
 
-  const setDataControlled = useCallback((newData: T) => {
+  const setDataControlled = useCallback((newData: T | null) => {
     setLoading(false);
     setError(null);
     setData(newData);

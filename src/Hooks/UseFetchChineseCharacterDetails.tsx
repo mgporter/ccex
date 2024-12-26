@@ -3,6 +3,7 @@ import { CHINESE_CHARACTER_DETAILS } from "../Api/endpoints";
 import { ChineseCharacter } from "../Api/types";
 import useFetch from "./UseFetch";
 import { chineseCharacterCache } from "../Utils/CharacterCharacterCache";
+import { getChineseCharacterAt } from "../Utils/CharacterUtils";
 
 
 interface CharacterDetailsDataInfo {
@@ -45,21 +46,60 @@ function getInfo(cchar: ChineseCharacter | null): CharacterDetailsDataInfo {
 }
 
 
-export default function useFetchChineseCharacterDetails() {
+export default function useFetchChineseCharacterDetails(char: string | undefined | null) {
 
-  const { loading, error, data, setData, callFetch, reset } = useFetch<ChineseCharacter>();
-  const [ char, setChar ] = useState("");
+  const { loading, error, data, setData, callFetch, reset, abortFetch } = useFetch<ChineseCharacter>();
+  const [ controlledChar, setControlledChar ] = useState("");
 
-  function fetchData(char: string) {
-    if (char.length === 0) return;
+  // useEffect(() => {
+  //   if (char && char.length > 0) {
 
-    // Just taking the first index of the string (char[0]) may not
-    // give us all of the codepoints of the first character. Doing
-    // [...char] will divide each character correctly, since a character
-    // may consist of more than two charcodes.
-    char = [...char][0];
+  //     const firstChar = getChineseCharacterAt(char, 0);
+  
+  //     chineseCharacterCache.getFromCacheOrFetch(
+  //       firstChar,
+  //       setData,
+  //       () => callFetch(CHINESE_CHARACTER_DETAILS, char)
+  //     );
+  //   } else {
+  //     setData(null);
+  //   }
+  // }, [char, callFetch, setData])
 
-    setChar(char);
+  useEffect(() => {
+
+    if (!char) {
+      setData(null);
+      return;
+    }
+
+    const firstChar = getChineseCharacterAt(char, 0);
+
+    if (firstChar.length === 0) return;
+
+    setControlledChar(char);
+
+    chineseCharacterCache.getFromCacheOrFetch(
+      firstChar,
+      setData,
+      () => callFetch(CHINESE_CHARACTER_DETAILS, firstChar)
+    );
+
+    return () => {
+      abortFetch();
+    }
+
+  }, [char, callFetch, abortFetch, setData])
+
+  function fetchData(char: string | null) {
+    if (!char || char.length === 0) {
+      setData(null);
+      return;
+    }
+
+    char = getChineseCharacterAt(char, 0);
+
+    setControlledChar(char);
 
     chineseCharacterCache.getFromCacheOrFetch(
       char,
@@ -81,7 +121,7 @@ export default function useFetchChineseCharacterDetails() {
     data,
     fetchData,
     reset,
-    char,
+    char: controlledChar,
     info: getInfo(data),
     notFound: !loading && !error && !data
   }

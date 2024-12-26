@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { ChineseCharacterTreeMapDTO, ComponentStub } from "../Api/types";
+import { ccexDispatcher } from "../Utils/CCEXDispatcher";
 
 
 const TREE_CONTAINER_STYLE = `relative z-10`;
@@ -100,6 +101,7 @@ function createCompBoxDiv(component: ComponentStub) {
   
   const characterBox = document.createElement("div");
   characterBox.setAttribute("data-char", component.char);
+  characterBox.onclick = () => ccexDispatcher.dispatch("showCharDetails", component.char);
 
   const character = document.createElement("p");
   character.textContent = component.char;
@@ -214,9 +216,6 @@ function drawConnection(
 }
 
 
-
-
-
 export interface CharacterTreeProps {
   chineseCharacter: ChineseCharacterTreeMapDTO;
 }
@@ -227,9 +226,16 @@ export default function CharacterTree({ chineseCharacter }: CharacterTreeProps) 
   const canvasRef = useRef<HTMLCanvasElement>(null!);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
-  const components = createComponentWithChildrenArray(chineseCharacter);
+  const components = useMemo(() => createComponentWithChildrenArray(chineseCharacter), [chineseCharacter]);
+  
+  const drawAndScaleCanvasCallback = useCallback(() => {
+    const canvasRect = canvasRef.current.getBoundingClientRect();
+    if (ctxRef.current != null) {
+      drawAndScaleCanvas(canvasRef.current, ctxRef.current, canvasRect, components);
+    }
+  }, [components])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
 
     const treeDiv = createTreeDiv(components);
     const treeCanvas = createCanvas();
@@ -240,16 +246,9 @@ export default function CharacterTree({ chineseCharacter }: CharacterTreeProps) 
     canvasRef.current = treeCanvas;
     ctxRef.current = canvasRef.current.getContext("2d");
 
-    const onResize = () => {
-      const canvasRect = canvasRef.current.getBoundingClientRect();
-      if (ctxRef.current != null) {
-        drawAndScaleCanvas(canvasRef.current, ctxRef.current, canvasRect, components);
-      }
-    };
+    drawAndScaleCanvasCallback();
 
-    onResize();
-
-    window.addEventListener("resize", onResize);
+    window.addEventListener("resize", drawAndScaleCanvasCallback);
 
     return () => {
 
@@ -259,29 +258,39 @@ export default function CharacterTree({ chineseCharacter }: CharacterTreeProps) 
       } catch (e) { // eslint-disable-line @typescript-eslint/no-unused-vars
         // Do nothing;
       } finally {
-        window.removeEventListener("resize", onResize);
+        window.removeEventListener("resize", drawAndScaleCanvasCallback);
       }
 
     }
-  }, [components])
+  }, [components, drawAndScaleCanvasCallback])
 
-  // useEffect(() => {
-  //   const rows = document.querySelectorAll(`[data-rootchar="${chineseCharacter.char}"] .component-row`);
+  useEffect(() => {
 
-  //   for (const row of rows) {
-  //     (row as HTMLElement).style.gap = "0.1rem";
-  //     (row as HTMLElement).style.minWidth = "0.1rem";
-  //   }
+    // If the tree is wider than the screen,
+    // then decrease the size of the tree.
 
-  //   const boxes = document.querySelectorAll(`[data-rootchar="${chineseCharacter.char}"] .component-box:not(.component-root)`);
+    const rect = containerRef.current.getBoundingClientRect();
 
-  //   for (const box of boxes) {
-  //     (box as HTMLElement).style.width = "3rem";
-  //     (box as HTMLElement).style.height = "3rem";
-  //     (box as HTMLElement).style.fontSize = "1.8rem";
-  //   }
+    if (rect.width > window.innerWidth) {
+      const rows = document.querySelectorAll(`[data-rootchar="${chineseCharacter.char}"] .component-row`);
 
-  // })
+      for (const row of rows) {
+        (row as HTMLElement).style.gap = "0.1rem";
+        (row as HTMLElement).style.minWidth = "0.1rem";
+      }
+
+      const boxes = document.querySelectorAll(`[data-rootchar="${chineseCharacter.char}"] .component-box:not(.component-root)`);
+
+      for (const box of boxes) {
+        (box as HTMLElement).style.width = "3rem";
+        (box as HTMLElement).style.height = "3rem";
+        (box as HTMLElement).style.fontSize = "1.8rem";
+      }
+
+      drawAndScaleCanvasCallback();
+    }
+
+  }, [chineseCharacter.char, drawAndScaleCanvasCallback])
 
   return (
       <div id="tree" data-rootchar={chineseCharacter.char} ref={containerRef} 

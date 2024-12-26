@@ -1,8 +1,7 @@
 import { TradCharacterStub } from "../Api/types";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import useScrollbarIsVisible from "../Hooks/UseScrollbarIsVisible";
 import CloseButton from "./CloseButton";
-import { CharacterDetailsContext } from "./CharacterDetailsDialogContainer";
 
 import freq00 from '/frequency-meter/freq00.png';
 import freq10 from '/frequency-meter/freq10.png';
@@ -15,6 +14,7 @@ import freq70 from '/frequency-meter/freq70.png';
 import freq80 from '/frequency-meter/freq80.png';
 import freq90 from '/frequency-meter/freq90.png';
 import { ccexDispatcher } from "../Utils/CCEXDispatcher";
+import useCharacterDetailsContext from "../Hooks/UseCharacterDetailsContext";
 
 const frequencyMeterUrls: Record<number, string> = {
   0: freq00,
@@ -30,21 +30,21 @@ const frequencyMeterUrls: Record<number, string> = {
 };
 
 interface CharacterDetailsProps {
-  isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  isOpen: boolean;
+  closeAction: () => void;
 }
 
-export default function CharacterDetailsDialog({ isOpenState }: CharacterDetailsProps) {
+export default function CharacterDetailsDialog({ closeAction }: CharacterDetailsProps) {
 
-  const { data } = useContext(CharacterDetailsContext);
+  const { data } = useCharacterDetailsContext();
   const contentRef = useRef<HTMLDivElement | null>(null); // nullable, since the content div is conditionally rendered
   const scrollbarIsVisible = useScrollbarIsVisible(contentRef, data);
-  const setIsOpen = isOpenState[1];
 
   return (
     <div className="character-details-dialog gap-4 p-2">
       <LargeCharDisplayWidget size={128} styles="absolute top-[-20px] left-[-20px]" />
 
-      <CloseButton callback={() => setIsOpen(false)} styles={`absolute top-2 px-[6px] ${scrollbarIsVisible ? "right-6" : "right-2"}`} />
+      <CloseButton callback={closeAction} styles={`absolute top-2 px-[6px] ${scrollbarIsVisible ? "right-6" : "right-2"}`} />
 
       <div ref={contentRef} className="content max-h-[80vh] overflow-y-auto p-2 pb-6">
         <PinyinWidget />
@@ -59,9 +59,7 @@ export default function CharacterDetailsDialog({ isOpenState }: CharacterDetails
   )
 }
 
-export function CharacterDetailsInline({ isOpenState }: CharacterDetailsProps) {
-
-  const [isOpen, setIsOpen] = isOpenState;
+export function CharacterDetailsInline({ isOpen, closeAction }: CharacterDetailsProps) {
 
   return (
     <aside className={`character-details-inline flex flex-col w-full px-2 py-8 bg-slate-200 border-y border-slate-400
@@ -81,7 +79,7 @@ export function CharacterDetailsInline({ isOpenState }: CharacterDetailsProps) {
       <MainContentWidget />
 
       <CloseButton 
-        callback={() => setIsOpen(false)} 
+        callback={closeAction} 
         styles={`w-full mt-12 bg-red-100 h-12 border-slate-500/50`} 
       />
 
@@ -92,7 +90,7 @@ export function CharacterDetailsInline({ isOpenState }: CharacterDetailsProps) {
 
 function FrequencyWidget({ styles }: { styles?: string }) {
 
-  const { data, loading, info, notFound, error } = useContext(CharacterDetailsContext);
+  const { data, loading, info, notFound, error } = useCharacterDetailsContext();
 
   return (
     <div className={"flex flex-col items-center " + styles}>
@@ -112,7 +110,7 @@ function FrequencyWidget({ styles }: { styles?: string }) {
 
 function MainContentWidget() {
 
-  const { data, loading, info, error, notFound } = useContext(CharacterDetailsContext);
+  const { data, loading, info, error, notFound } = useCharacterDetailsContext();
 
   if (data) {
     return (
@@ -171,7 +169,7 @@ function MainContentWidget() {
 
 function TraditionalCharsWidget({ styles }: { styles?: string }) {
 
-  const { data, loading, info, error, notFound } = useContext(CharacterDetailsContext);
+  const { data, loading, info, error, notFound } = useCharacterDetailsContext();
 
   return (
     <div className={"flex flex-col gap-2 items-center " + styles}>
@@ -207,7 +205,7 @@ function TradCharacterStubBox({ char }: { char: TradCharacterStub }) {
 
 function PinyinWidget({ styles }: { styles?: string }) {
 
-  const { data, loading, info, error, notFound } = useContext(CharacterDetailsContext);
+  const { data, loading, info, error, notFound } = useCharacterDetailsContext();
 
   return (
     <>
@@ -226,7 +224,7 @@ function PinyinWidget({ styles }: { styles?: string }) {
 
 function LargeCharDisplayWidget({ size, styles }: { size:number, styles?: string }) {
 
-  const { char } = useContext(CharacterDetailsContext);
+  const { char } = useCharacterDetailsContext();
   
   return (
     <div className={"flex justify-center items-center pb-[0%] noto-serif-sc \

@@ -1,14 +1,15 @@
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 
 interface DialogModalProps extends React.PropsWithChildren {
-  isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  isOpen: boolean;
+  closeAction: () => void;
 }
 
-export default function DialogModel({ isOpenState: [isOpen, setIsOpen], children }: DialogModalProps) {
+export default function DialogModel({ isOpen, closeAction, children }: DialogModalProps) {
 
 
   return (
-    <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-[2000]">
+    <Dialog open={isOpen} onClose={closeAction} className="relative z-[2000]">
       <DialogBackdrop className="fixed inset-0 bg-black/30" />
       <div className="fixed inset-0 flex w-screen items-center justify-center p-4
         lg:p-0">

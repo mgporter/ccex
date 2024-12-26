@@ -51,6 +51,21 @@ body {
   background-color: #fafaf9;
 }
 
+input[type="checkbox"] {
+  box-sizing: border-box;
+  appearance: none;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 0.125rem;
+}
+
+input[type="checkbox"]:checked {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 32 32" xml:space="preserve"><path style="fill: %23000000" d="M11.941,28.877l-11.941-11.942l5.695-5.696l6.246,6.246l14.364-14.364L32,8.818"/></svg>');
+  background-size: 85%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 #root {
   width: inherit;
   min-height: inherit;

@@ -1,7 +1,7 @@
 import { Dispatcher } from "./Dispatcher";
 
 interface CCEXEventMap {
-  showCharDetails: string;
+  showCharDetails: string | null;
 }
 
 const ccexDispatcher = new Dispatcher<CCEXEventMap>();

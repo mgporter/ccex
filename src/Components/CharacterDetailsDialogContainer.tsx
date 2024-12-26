@@ -3,26 +3,14 @@ import useFetchChineseCharacterDetails from "../Hooks/UseFetchChineseCharacterDe
 import CharacterDetailsDialog, { CharacterDetailsInline } from "./CharacterDetailsDialog";
 import DialogModel from "./DialogModal";
 import { ChineseCharacterBasicDTO, ComponentStub, DerivativeStub } from "../Api/types";
-import { createContext } from "react";
-
-export const CharacterDetailsContext = createContext<ReturnType<typeof useFetchChineseCharacterDetails>>(null!);
+import { CharacterDetailsContext } from "../Hooks/UseCharacterDetailsContext";
+import { useSearchParams } from "react-router-dom";
+import { ccexDispatcher } from "../Utils/CCEXDispatcher";
+import useMatchSmallScreenQuery from "../Hooks/UseMatchSmallScreenQuery";
 
 interface CharacterDetailsDialogProps {
   isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
-  fetchDetailsHook: ReturnType<typeof useFetchChineseCharacterDetails>;
-  isSmallScreen: boolean;
 }
-
-// export interface CharacterDetailsDataInfo {
-//   hasPrimaryPinyin: boolean;
-//   hasSecondaryPinyin: boolean; 
-//   hasTraditional: boolean;
-//   frequencyMeterNumber: number;
-//   hasTradDescriptions: boolean;
-//   hasComponents: boolean;
-//   hasDerivatives: boolean;
-//   hasVariants: boolean;
-// }
 
 type ObjectWithChar = { char: string }
 
@@ -36,7 +24,27 @@ function ensureUniqueChar<T extends ObjectWithChar>(arr: T[]): T[] {
   return [...map.values()];
 }
 
-export default function CharacterDetailsDialogContainer({isOpenState, fetchDetailsHook, isSmallScreen}: CharacterDetailsDialogProps) {
+export default function CharacterDetailsDialogContainer({ isOpenState }: CharacterDetailsDialogProps) {
+
+  const [ searchParams, setSearchParams ] = useSearchParams();
+  const [ isOpen, setIsOpen ] = isOpenState;
+  const fetchDetailsHook = useFetchChineseCharacterDetails(searchParams.get("details"));
+  const isSmallScreen = useMatchSmallScreenQuery();
+
+  useEffect(() => {
+    const unsubscribe = ccexDispatcher.subscribe("showCharDetails", (char: string | null) => {
+      if (char) {
+        setIsOpen(true);
+        fetchDetailsHook.fetchData(char);
+        setSearchParams((prev) => { prev.set("details", char); return prev });
+      } else {
+        searchParams.delete("details");
+        setIsOpen(false);
+      }
+    });
+
+    return unsubscribe;
+  }, [searchParams, setIsOpen, fetchDetailsHook, setSearchParams])
 
   useEffect(() => {
     if (isSmallScreen) {
@@ -44,29 +52,23 @@ export default function CharacterDetailsDialogContainer({isOpenState, fetchDetai
     }
   }, [fetchDetailsHook, isSmallScreen])
 
-  // const info: CharacterDetailsDataInfo = { 
-  //   hasPrimaryPinyin: false,
-  //   hasSecondaryPinyin: false, 
-  //   hasTraditional: false,
-  //   frequencyMeterNumber: 0,
-  //   hasTradDescriptions: false,
-  //   hasComponents: false,
-  //   hasDerivatives: false,
-  //   hasVariants: false
-  // }
+  useEffect(() => {
+    if (searchParams.has("details")) {
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
+    }
+  }, [searchParams, setIsOpen])
+
+  const closeAction = () => {
+    setIsOpen(false);
+    searchParams.delete("details");
+    setSearchParams(searchParams);
+  }
 
   const data = fetchDetailsHook.data;
 
   if (data) {
-    // info.hasPrimaryPinyin = data.primaryPinyin.length > 0;
-    // info.hasSecondaryPinyin = data.secondaryPinyin.length > 0;
-    // info.hasTraditional = data.tradChars.length > 0;
-    // info.hasTradDescriptions = info.hasTraditional && data.tradChars[0].description != null;
-    // info.frequencyMeterNumber = data.frequency === 100 ? 9 : Math.floor(data.frequency / 10);
-    // info.hasComponents = data.components.length > 0;
-    // info.hasDerivatives = data.derivatives.length > 0;
-    // info.hasVariants = data.variants.length > 0;
-
     data.components = ensureUniqueChar<ComponentStub>(data.components);
     data.variants = ensureUniqueChar<ChineseCharacterBasicDTO>(data.variants);
     data.derivatives = ensureUniqueChar<DerivativeStub>(data.derivatives);
@@ -75,10 +77,10 @@ export default function CharacterDetailsDialogContainer({isOpenState, fetchDetai
   return (
     <CharacterDetailsContext.Provider value={fetchDetailsHook}>
       {isSmallScreen ? (
-        <CharacterDetailsInline isOpenState={isOpenState} />
+        <CharacterDetailsInline isOpen={isOpen} closeAction={closeAction} />
       ) : (
-        <DialogModel isOpenState={isOpenState}>
-          <CharacterDetailsDialog isOpenState={isOpenState} />
+        <DialogModel isOpen={isOpen} closeAction={closeAction}>
+          <CharacterDetailsDialog isOpen={isOpen} closeAction={closeAction} />
         </DialogModel>  
       )}
     </CharacterDetailsContext.Provider>
