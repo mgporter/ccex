@@ -75,7 +75,7 @@ export default function useFetchChineseCharacterDetails(char: string | undefined
 
     const firstChar = getChineseCharacterAt(char, 0);
 
-    if (firstChar.length === 0) return;
+    if (!firstChar) return;
 
     setControlledChar(char);
 
@@ -91,23 +91,6 @@ export default function useFetchChineseCharacterDetails(char: string | undefined
 
   }, [char, callFetch, abortFetch, setData])
 
-  function fetchData(char: string | null) {
-    if (!char || char.length === 0) {
-      setData(null);
-      return;
-    }
-
-    char = getChineseCharacterAt(char, 0);
-
-    setControlledChar(char);
-
-    chineseCharacterCache.getFromCacheOrFetch(
-      char,
-      setData,
-      () => callFetch(CHINESE_CHARACTER_DETAILS, char)
-    );
-
-  }
 
   useEffect(() => {
     if (data) {
@@ -119,7 +102,6 @@ export default function useFetchChineseCharacterDetails(char: string | undefined
     loading,
     error,
     data,
-    fetchData,
     reset,
     char: controlledChar,
     info: getInfo(data),

@@ -6,7 +6,7 @@ export function stringToUnicodeList(str: string): string[] {
   return [...str];
 }
 
-export function getChineseCharacterAt(str: string, index: number): string {
+export function getChineseCharacterAt(str: string, index: number): string | undefined {
   return stringToUnicodeList(str).filter(c => isChinese(c))[index];
 }
 

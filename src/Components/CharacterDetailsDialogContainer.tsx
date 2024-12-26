@@ -32,25 +32,21 @@ export default function CharacterDetailsDialogContainer({ isOpenState }: Charact
   const isSmallScreen = useMatchSmallScreenQuery();
 
   useEffect(() => {
-    const unsubscribe = ccexDispatcher.subscribe("showCharDetails", (char: string | null) => {
+    const unsubscribe = ccexDispatcher.subscribe("showCharDetails", (char: string | null | undefined) => {
       if (char) {
-        setIsOpen(true);
-        fetchDetailsHook.fetchData(char);
         setSearchParams((prev) => { prev.set("details", char); return prev });
+
+        if (isSmallScreen) {
+          window.scrollTo({top: 0, behavior: "instant"})
+        }
+
       } else {
-        searchParams.delete("details");
-        setIsOpen(false);
+        setSearchParams(prev => { prev.delete("details"); return prev })
       }
     });
 
     return unsubscribe;
-  }, [searchParams, setIsOpen, fetchDetailsHook, setSearchParams])
-
-  useEffect(() => {
-    if (isSmallScreen) {
-      window.scrollTo({top: 0, behavior: "instant"})
-    }
-  }, [fetchDetailsHook, isSmallScreen])
+  }, [searchParams, setIsOpen, fetchDetailsHook, setSearchParams, isSmallScreen])
 
   useEffect(() => {
     if (searchParams.has("details")) {

@@ -1,4 +1,5 @@
 import { ChineseCharacterTreeMapDTO, DerivativeStub } from "../Api/types";
+import { ccexDispatcher } from "../Utils/CCEXDispatcher";
 
 export interface CharacterDerivativeBoxProps {
   chineseCharacter: ChineseCharacterTreeMapDTO;
@@ -54,10 +55,11 @@ export default function CharacterDerivativeBox({ chineseCharacter }: CharacterDe
 
 function DerivativeBox({ char }: {char?: string}) {
   return (
-    <div data-char={char} className="component-box character-with-details flex items-center justify-center text-[1.3rem] border-2 size-[2.4rem] select-none cursor-pointer noto-serif-sc
+    <div data-char={char} className="component-box flex items-center justify-center text-[1.3rem] border-2 size-[2.4rem] select-none cursor-pointer noto-serif-sc
       border-stone-400 bg-stone-100 active:border-stone-700 active:bg-stone-400
       opacity-50 hover:opacity-100"
-      style={{ visibility: char ? "visible" : "hidden"}}>
+      style={{ visibility: char ? "visible" : "hidden"}}
+      onClick={() => ccexDispatcher.dispatch("showCharDetails", char)}>
       <p>{char}</p>
     </div>
   )
