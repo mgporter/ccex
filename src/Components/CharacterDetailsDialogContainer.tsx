@@ -35,12 +35,22 @@ export default function CharacterDetailsDialogContainer({ isOpenState }: Charact
     const unsubscribe = ccexDispatcher.subscribe("showCharDetails", (char: string | null | undefined) => {
       if (char) {
         setSearchParams((prev) => { prev.set("details", char); return prev });
+        // setSearchParams(prev => ({
+        //   ...Object.fromEntries(prev),
+        //   details: char
+        // }));
 
         if (isSmallScreen) {
           window.scrollTo({top: 0, behavior: "instant"})
         }
 
       } else {
+        // setSearchParams(prev => {
+        //   prev.delete("details");
+        //   return {
+        //     ...Object.fromEntries(prev)
+        //   }
+        // });
         setSearchParams(prev => { prev.delete("details"); return prev })
       }
     });

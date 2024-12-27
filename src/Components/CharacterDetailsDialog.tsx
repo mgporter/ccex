@@ -13,8 +13,8 @@ import freq60 from '/frequency-meter/freq60.png';
 import freq70 from '/frequency-meter/freq70.png';
 import freq80 from '/frequency-meter/freq80.png';
 import freq90 from '/frequency-meter/freq90.png';
-import { ccexDispatcher } from "../Utils/CCEXDispatcher";
 import useCharacterDetailsContext from "../Hooks/UseCharacterDetailsContext";
+import { CharacterWithDetails } from "./ClickableCharacter";
 
 const frequencyMeterUrls: Record<number, string> = {
   0: freq00,
@@ -127,23 +127,23 @@ function MainContentWidget() {
           <div className="mb-4">
             <h4 className="font-semibold mb-2">This character is also the combination of traditional characters with different meanings:</h4>
             {data.tradChars.map(c => (
-              <p key={c.char} className="ml-4"><span className="font-semibold">{c.char} ({c.definition}): </span>{c.description}</p>
+              <p key={c.char} className="ml-4 mb-4"><span className="font-semibold">{c.char} ({c.definition}): </span>{c.description}</p>
             ))}
           </div>
         )}
 
         <p>
           <span className="font-semibold">Components: </span>
-          {info.hasComponents ? data.components.map(c => <CharacterWithDispatch key={c.char} char={c.char} />) : <span className="italic">no components</span>}
+          {info.hasComponents ? data.components.map(c => <CharacterWithDetails key={c.char} char={c.char} />) : <span className="italic">no components</span>}
         </p>
 
         {info.hasVariants && <p>
-          <span className="font-semibold">Variants: </span>{data.variants.map(c => <CharacterWithDispatch key={c.char} char={c.char} />)}
+          <span className="font-semibold">Variants: </span>{data.variants.map(c => <CharacterWithDetails key={c.char} char={c.char} />)}
         </p>}
 
         <p>
           <span className="font-semibold">Derivative characters: </span>
-          {info.hasDerivatives ? data.derivatives.map(c => <CharacterWithDispatch key={c.char} char={c.char} />) : <span className="italic">no derivatives</span>}
+          {info.hasDerivatives ? data.derivatives.map(c => <CharacterWithDetails key={c.char} char={c.char} />) : <span className="italic">no derivatives</span>}
         </p>
       </>
     )
@@ -236,17 +236,5 @@ function LargeCharDisplayWidget({ size, styles }: { size:number, styles?: string
         fontSize: `${size / 25}rem`,
       }}
     >{char}</div>    
-  )
-}
-
-
-function CharacterWithDispatch({ char }: { char: string }) {
-  return (
-    <span
-      onClick={() => ccexDispatcher.dispatch("showCharDetails", char)}
-      className="cursor-pointer mx-1 noto-serif-sc text-lg
-      hover:text-red-500">
-      {char}
-    </span>
   )
 }
