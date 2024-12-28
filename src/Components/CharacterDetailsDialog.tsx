@@ -14,7 +14,7 @@ import freq70 from '/frequency-meter/freq70.png';
 import freq80 from '/frequency-meter/freq80.png';
 import freq90 from '/frequency-meter/freq90.png';
 import useCharacterDetailsContext from "../Hooks/UseCharacterDetailsContext";
-import { CharacterWithDetails } from "./ClickableCharacter";
+import { DetailsDialogCharacters } from "./ClickableCharacter";
 
 const frequencyMeterUrls: Record<number, string> = {
   0: freq00,
@@ -134,16 +134,16 @@ function MainContentWidget() {
 
         <p>
           <span className="font-semibold">Components: </span>
-          {info.hasComponents ? data.components.map(c => <CharacterWithDetails key={c.char} char={c.char} />) : <span className="italic">no components</span>}
+          {info.hasComponents ? data.components.map(c => <DetailsDialogCharacters key={c.char} char={c.char} />) : <span className="italic">no components</span>}
         </p>
 
         {info.hasVariants && <p>
-          <span className="font-semibold">Variants: </span>{data.variants.map(c => <CharacterWithDetails key={c.char} char={c.char} />)}
+          <span className="font-semibold">Variants: </span>{data.variants.map(c => <DetailsDialogCharacters key={c.char} char={c.char} />)}
         </p>}
 
         <p>
           <span className="font-semibold">Derivative characters: </span>
-          {info.hasDerivatives ? data.derivatives.map(c => <CharacterWithDetails key={c.char} char={c.char} />) : <span className="italic">no derivatives</span>}
+          {info.hasDerivatives ? data.derivatives.map(c => <DetailsDialogCharacters key={c.char} char={c.char} />) : <span className="italic">no derivatives</span>}
         </p>
       </>
     )

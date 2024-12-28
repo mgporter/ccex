@@ -4,9 +4,9 @@ import CharacterDetailsDialog, { CharacterDetailsInline } from "./CharacterDetai
 import DialogModel from "./DialogModal";
 import { ChineseCharacterBasicDTO, ComponentStub, DerivativeStub } from "../Api/types";
 import { CharacterDetailsContext } from "../Hooks/UseCharacterDetailsContext";
-import { useSearchParams } from "react-router-dom";
 import { ccexDispatcher } from "../Utils/CCEXDispatcher";
 import useMatchSmallScreenQuery from "../Hooks/UseMatchSmallScreenQuery";
+import useSearchParamActions from "../Hooks/UseSearchParamActions";
 
 interface CharacterDetailsDialogProps {
   isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
@@ -26,50 +26,39 @@ function ensureUniqueChar<T extends ObjectWithChar>(arr: T[]): T[] {
 
 export default function CharacterDetailsDialogContainer({ isOpenState }: CharacterDetailsDialogProps) {
 
-  const [ searchParams, setSearchParams ] = useSearchParams();
+  const { setSearchParamDetails, removeSearchParamDetails, getSearchParamDetails, searchParamsHasDetails } = useSearchParamActions();
   const [ isOpen, setIsOpen ] = isOpenState;
-  const fetchDetailsHook = useFetchChineseCharacterDetails(searchParams.get("details"));
+  const fetchDetailsHook = useFetchChineseCharacterDetails(getSearchParamDetails);
   const isSmallScreen = useMatchSmallScreenQuery();
 
   useEffect(() => {
     const unsubscribe = ccexDispatcher.subscribe("showCharDetails", (char: string | null | undefined) => {
       if (char) {
-        setSearchParams((prev) => { prev.set("details", char); return prev });
-        // setSearchParams(prev => ({
-        //   ...Object.fromEntries(prev),
-        //   details: char
-        // }));
+        setSearchParamDetails(char);
 
         if (isSmallScreen) {
           window.scrollTo({top: 0, behavior: "instant"})
         }
 
       } else {
-        // setSearchParams(prev => {
-        //   prev.delete("details");
-        //   return {
-        //     ...Object.fromEntries(prev)
-        //   }
-        // });
-        setSearchParams(prev => { prev.delete("details"); return prev })
+        removeSearchParamDetails();
       }
     });
 
     return unsubscribe;
-  }, [searchParams, setIsOpen, fetchDetailsHook, setSearchParams, isSmallScreen])
+  }, [isSmallScreen, removeSearchParamDetails, setSearchParamDetails])
 
   useEffect(() => {
-    if (searchParams.has("details")) {
+    if (searchParamsHasDetails) {
       setIsOpen(true);
     } else {
       setIsOpen(false);
     }
-  }, [searchParams, setIsOpen])
+  }, [searchParamsHasDetails, setIsOpen])
 
   const closeAction = () => {
     setIsOpen(false);
-    searchParams.delete("details");
-    setSearchParams(searchParams);
+    removeSearchParamDetails();
   }
 
   const data = fetchDetailsHook.data;

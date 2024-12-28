@@ -1,17 +1,17 @@
 import { useState } from "react";
 import useFetchChineseCharacterTreeMaps from "../Hooks/UseFetchChineseCharacterTreeMaps";
 import CharacterTree from "./CharacterTree";
-import { useSearchParams } from "react-router";
 import CharacterDetailsDialogContainer from "./CharacterDetailsDialogContainer";
 import CharacterDerivativeBox from "./CharacterDerivativeBox";
 import React from "react";
 import { useCCEXStore } from "../Hooks/UseCCEXExplorerStore";
+import useSearchParamActions from "../Hooks/UseSearchParamActions";
 
 
 export default function Explorer() {
 
-  const [ searchParams ] = useSearchParams();
-  const { treemapsLoading, treemapsError, treemapsData } = useFetchChineseCharacterTreeMaps(searchParams.get("chars"));
+  const { getSearchParamTreeMaps,  } = useSearchParamActions();
+  const { treemapsLoading, treemapsError, treemapsData } = useFetchChineseCharacterTreeMaps(getSearchParamTreeMaps);
   const dialogOpenState = useState(false);
   const { showDerivatives } = useCCEXStore();
 

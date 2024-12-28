@@ -1,17 +1,17 @@
 import { Button, Field, Input, Label } from "@headlessui/react";
 import { useCallback, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
 import { useCCEXStore } from "../Hooks/UseCCEXExplorerStore";
 import { getChineseCharactersRange } from "../Utils/CharacterUtils";
 import { generateRandomChinese } from "../Utils/RandomButton";
 import useSearchHistory from "../Hooks/UseSearchHistory";
-import { CharacterWithTree } from "./ClickableCharacter";
+import { NavigatorHistoryCharacter } from "./ClickableCharacter";
 import { ccexDispatcher } from "../Utils/CCEXDispatcher";
+import useSearchParamActions from "../Hooks/UseSearchParamActions";
 
 export default function Navigator() {
 
   const inputRef = useRef<HTMLInputElement>(null!);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { setSearchParamTreeMaps, getSearchParamTreeMaps } = useSearchParamActions();
   const { showDerivatives, toggleShowDerivatives } = useCCEXStore();
   const { history, addToHistory } = useSearchHistory();
 
@@ -22,22 +22,15 @@ export default function Navigator() {
 
     addToHistory(filteredChars);
 
-    setSearchParams(prev => {
-      prev.delete("details");
-      return {
-        ...Object.fromEntries(prev),
-        chars: filteredChars,
-      }
-    });
-  }, [addToHistory, setSearchParams]);
+    setSearchParamTreeMaps(filteredChars);
+
+  }, [addToHistory, setSearchParamTreeMaps]);
 
   useEffect(() => {
-    const charsParam = searchParams.get('chars');
-    if (charsParam && inputRef.current.value !== charsParam) {
-      inputRef.current.value = charsParam;
+    if (getSearchParamTreeMaps && inputRef.current.value !== getSearchParamTreeMaps) {
+      inputRef.current.value = getSearchParamTreeMaps;
     }
-
-  }, [searchParams])
+  }, [getSearchParamTreeMaps])
 
   useEffect(() => {
     const unsubscribe = ccexDispatcher.subscribe("showCharTree", (chars: string | null | undefined) => {
@@ -80,11 +73,17 @@ export default function Navigator() {
           <Label>Show derivative characters</Label>
           <Input type="checkbox" className="size-4" checked={showDerivatives} onChange={toggleShowDerivatives} />
         </Field>
-        <div className="noto-serif-sc text-left w-[20rem] whitespace-nowrap overflow-hidden overflow-ellipsis">
-          {history.map(c => 
-            <CharacterWithTree key={c} char={c} />
-          )}
-        </div>
+        {history.length > 0 && (
+          <div className="relative w-full bg-white/30 py-[1px] px-[4px] rounded-md
+            lg:rounded-none">
+            <div className="noto-serif-sc text-right whitespace-nowrap overflow-hidden overflow-ellipsis">
+              {history.map(c => 
+                <NavigatorHistoryCharacter key={c} char={c} />
+              )}
+            </div>
+            <div className="absolute top-[-0.8rem] left-[0px] italic text-[0.7rem] font-sans opacity-70">history</div> 
+          </div>
+        )}
       </div>
     </div>
   )
