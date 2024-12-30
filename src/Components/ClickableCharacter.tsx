@@ -22,9 +22,9 @@ export function CharacterWithDetails({ char, styles }: { char: string, styles?: 
   )
 }
 
-export function CharacterWithTree({ char, styles }: { char: string, styles?: string }) {
+export function CharacterWithTree({ chars, styles, pushToHistory }: { chars: string, styles?: string, pushToHistory?: boolean }) {
   return (
-    <ClickableCharacter char={char} styles={styles} onClick={() => ccexDispatcher.dispatch("showCharTree", char)} />
+    <ClickableCharacter char={chars} styles={styles} onClick={() => ccexDispatcher.dispatch("showCharTree", { chars, pushToHistory } )} />
   )
 }
 
@@ -38,9 +38,13 @@ export function DetailsDialogCharacters({ char }: { char: string }) {
   )
 }
 
-export function NavigatorHistoryCharacter({ char }: { char: string }) {
+export function NavigatorHistoryCharacter({ chars, isActive }: { chars: string, isActive: boolean }) {
   return (
-    <CharacterWithTree char={char} styles="mx-1
-      hover:text-red-700" />
+    <CharacterWithTree 
+      chars={chars} 
+      pushToHistory={false}
+      styles={`hover:text-red-800 border rounded-sm px-[2px]
+      ${isActive ? "border-red-800 text-red-800" : "border-transparent"}
+      lg:select-none`} />
   )
 }

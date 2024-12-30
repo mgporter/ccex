@@ -1,7 +1,7 @@
 import { TradCharacterStub } from "../Api/types";
 import { useRef } from "react";
 import useScrollbarIsVisible from "../Hooks/UseScrollbarIsVisible";
-import CloseButton from "./CloseButton";
+import { CharacterDetailsDialogCloseButton, CharacterDetailsInlineCloseButton } from "./CloseButton";
 
 import freq00 from '/frequency-meter/freq00.png';
 import freq10 from '/frequency-meter/freq10.png';
@@ -15,6 +15,8 @@ import freq80 from '/frequency-meter/freq80.png';
 import freq90 from '/frequency-meter/freq90.png';
 import useCharacterDetailsContext from "../Hooks/UseCharacterDetailsContext";
 import { DetailsDialogCharacters } from "./ClickableCharacter";
+import { Button } from "@headlessui/react";
+import { ccexDispatcher } from "../Utils/CCEXDispatcher";
 
 const frequencyMeterUrls: Record<number, string> = {
   0: freq00,
@@ -44,7 +46,9 @@ export default function CharacterDetailsDialog({ closeAction }: CharacterDetails
     <div className="character-details-dialog gap-4 p-2">
       <LargeCharDisplayWidget size={128} styles="absolute top-[-20px] left-[-20px]" />
 
-      <CloseButton callback={closeAction} styles={`absolute top-2 px-[6px] ${scrollbarIsVisible ? "right-6" : "right-2"}`} />
+      <CharacterDetailsDialogCloseButton 
+        callback={closeAction} 
+        styles={`absolute top-2 px-[6px] ${scrollbarIsVisible ? "right-6" : "right-2"}`} />
 
       <div ref={contentRef} className="content max-h-[80vh] overflow-y-auto p-2 pb-6">
         <PinyinWidget />
@@ -78,9 +82,9 @@ export function CharacterDetailsInline({ isOpen, closeAction }: CharacterDetails
 
       <MainContentWidget />
 
-      <CloseButton 
+      <CharacterDetailsInlineCloseButton 
         callback={closeAction} 
-        styles={`w-full mt-12 bg-red-100 h-12 border-slate-500/50`} 
+        styles="w-full mt-12 h-12"
       />
 
     </aside>
@@ -115,6 +119,13 @@ function MainContentWidget() {
   if (data) {
     return (
       <>
+        <Button onClick={() => ccexDispatcher.dispatch("showCharTree", { chars: data.char })}
+          className="border border-stone-400 bg-stone-200 shadow-sm mt-4 ml-[-2px] px-2 py-[2px]
+          rounded-md hover:bg-stone-300 transition-colors
+          active:bg-stone-400">
+          Show component tree for this character
+        </Button>
+
         <div className="mb-2 mt-6 font-semibold">
           <h3>Meaning: {data.definition}</h3>
             {data.base && <h4>This character is a variant of {data.base.char}</h4>}
@@ -215,7 +226,7 @@ function PinyinWidget({ styles }: { styles?: string }) {
         <h2 className={"text-3xl font-bold mb-1 " + styles}>
           {info.hasPrimaryPinyin ? data.primaryPinyin.join(", ") : <span className="italic font-normal text-xl">No pronunciation</span>} 
           {info.hasSecondaryPinyin && ` (also ${data.secondaryPinyin.join(", ")})`}
-        </h2>  
+        </h2>
       )}
     </>
   )

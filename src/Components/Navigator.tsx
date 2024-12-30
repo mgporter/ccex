@@ -5,7 +5,7 @@ import { getChineseCharactersRange } from "../Utils/CharacterUtils";
 import { generateRandomChinese } from "../Utils/RandomButton";
 import useSearchHistory from "../Hooks/UseSearchHistory";
 import { NavigatorHistoryCharacter } from "./ClickableCharacter";
-import { ccexDispatcher } from "../Utils/CCEXDispatcher";
+import { ccexDispatcher, ShowCharTreeProps } from "../Utils/CCEXDispatcher";
 import useSearchParamActions from "../Hooks/UseSearchParamActions";
 
 export default function Navigator() {
@@ -15,12 +15,12 @@ export default function Navigator() {
   const { showDerivatives, toggleShowDerivatives } = useCCEXStore();
   const { history, addToHistory } = useSearchHistory();
 
-  const fetchCharacterTrees = useCallback((chars: string): void => {
+  const fetchCharacterTrees = useCallback((chars: string, pushToHistory: boolean = true): void => {
     const filteredChars = getChineseCharactersRange(chars).join("");
 
     if (filteredChars.length === 0) return;
 
-    addToHistory(filteredChars);
+    if (pushToHistory) addToHistory(filteredChars);
 
     setSearchParamTreeMaps(filteredChars);
 
@@ -33,8 +33,8 @@ export default function Navigator() {
   }, [getSearchParamTreeMaps])
 
   useEffect(() => {
-    const unsubscribe = ccexDispatcher.subscribe("showCharTree", (chars: string | null | undefined) => {
-      if (chars) fetchCharacterTrees(chars);
+    const unsubscribe = ccexDispatcher.subscribe("showCharTree", ({chars, pushToHistory}: ShowCharTreeProps) => {
+      if (chars) fetchCharacterTrees(chars, pushToHistory);
     })
 
     return unsubscribe;
@@ -57,7 +57,7 @@ export default function Navigator() {
       <div className="flex flex-col justify-center items-center min-w-[16rem] max-w-[24rem] px-3 py-2 gap-1 backdrop-blur-[1px]
         bg-gradient-to-b from-blue-400/70 to-blue-200/70 ring-1 ring-blue-600/60
         pointer-events-auto rounded-b-2xl shadow-2xl border-x-2 border-b-1 border-blue-300
-        lg:w-full lg:rounded-none lg:shadow-none lg:border-x-0">
+        lg:w-full lg:max-w-full lg:rounded-none lg:shadow-none lg:border-x-0">
         <p>Enter Chinese characters:</p>
         <Field as="form" onSubmit={handleSubmit} className="flex h-[2.4rem] w-full justify-center text-black
           lg:h-[3.6rem]">
@@ -76,12 +76,12 @@ export default function Navigator() {
         {history.length > 0 && (
           <div className="relative w-full bg-white/30 py-[1px] px-[4px] rounded-md
             lg:rounded-none">
-            <div className="noto-serif-sc text-right whitespace-nowrap overflow-hidden overflow-ellipsis">
+            <div className="noto-serif-sc py-[1px] items-center justify-end whitespace-nowrap overflow-hidden overflow-ellipsis">
               {history.map(c => 
-                <NavigatorHistoryCharacter key={c} char={c} />
+                <NavigatorHistoryCharacter key={c} chars={c} isActive={getSearchParamTreeMaps === c} />
               )}
             </div>
-            <div className="absolute top-[-0.8rem] left-[0px] italic text-[0.7rem] font-sans opacity-70">history</div> 
+            {/* <div className="absolute select-none top-[-0.8rem] left-[0px] italic text-[0.7rem] font-sans opacity-70">history</div>  */}
           </div>
         )}
       </div>
