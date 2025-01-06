@@ -39,12 +39,14 @@ export function DetailsDialogCharacters({ char }: { char: string }) {
 }
 
 export function NavigatorHistoryCharacter({ chars, isActive }: { chars: string, isActive: boolean }) {
+  const common = "border rounded-sm px-[2px] lg:select-none "
+  const styles = isActive
+    ? "text-black border-indigo-800 bg-orange-500/10 "
+    : "text-blue-950 hover:border-indigo-800 hover:text-black border-transparent"
   return (
     <CharacterWithTree 
       chars={chars} 
       pushToHistory={false}
-      styles={`hover:text-red-800 border rounded-sm px-[2px]
-      ${isActive ? "border-red-800 text-red-800" : "border-transparent"}
-      lg:select-none`} />
+      styles={ common + styles } />
   )
 }

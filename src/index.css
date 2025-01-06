@@ -32,6 +32,8 @@ select:-webkit-autofill:focus {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
 }
 
 .noto-serif-sc {
@@ -43,11 +45,14 @@ select:-webkit-autofill:focus {
 
 body {
   margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
   /* min-width: 320px; */
   min-height: 100vh;
-  min-width: max-content;
+  min-width: 100vw;
+  /* width: 100%; */
+  /* width: max-content; */
   background-color: #fafaf9;
 }
 
@@ -68,8 +73,8 @@ input[type="checkbox"]:checked {
 }
 
 #root {
-  width: inherit;
-  min-height: inherit;
+  /* width: inherit;
+  min-height: inherit; */
 }
 
 main {

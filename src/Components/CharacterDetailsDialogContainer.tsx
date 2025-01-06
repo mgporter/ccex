@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { RefObject, useEffect } from "react";
 import useFetchChineseCharacterDetails from "../Hooks/UseFetchChineseCharacterDetails";
 import CharacterDetailsDialog, { CharacterDetailsInline } from "./CharacterDetailsDialog";
 import DialogModel from "./DialogModal";
@@ -10,6 +10,7 @@ import useSearchParamActions from "../Hooks/UseSearchParamActions";
 
 interface CharacterDetailsDialogProps {
   isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  parentRef: RefObject<HTMLElement>;
 }
 
 type ObjectWithChar = { char: string }
@@ -24,7 +25,7 @@ function ensureUniqueChar<T extends ObjectWithChar>(arr: T[]): T[] {
   return [...map.values()];
 }
 
-export default function CharacterDetailsDialogContainer({ isOpenState }: CharacterDetailsDialogProps) {
+export default function CharacterDetailsDialogContainer({ isOpenState, parentRef }: CharacterDetailsDialogProps) {
 
   const { setSearchParamDetails, removeSearchParamDetails, getSearchParamDetails, searchParamsHasDetails } = useSearchParamActions();
   const [ isOpen, setIsOpen ] = isOpenState;
@@ -37,7 +38,7 @@ export default function CharacterDetailsDialogContainer({ isOpenState }: Charact
         setSearchParamDetails(char);
 
         if (isSmallScreen) {
-          window.scrollTo({top: 0, behavior: "instant"})
+          parentRef.current.scroll({top: 0, behavior: "instant"});
         }
 
       } else {
@@ -46,7 +47,7 @@ export default function CharacterDetailsDialogContainer({ isOpenState }: Charact
     });
 
     return unsubscribe;
-  }, [isSmallScreen, removeSearchParamDetails, setSearchParamDetails])
+  }, [isSmallScreen, removeSearchParamDetails, setSearchParamDetails, parentRef])
 
   useEffect(() => {
     if (searchParamsHasDetails) {
@@ -74,7 +75,7 @@ export default function CharacterDetailsDialogContainer({ isOpenState }: Charact
       {isSmallScreen ? (
         <CharacterDetailsInline isOpen={isOpen} closeAction={closeAction} />
       ) : (
-        <DialogModel isOpen={isOpen} closeAction={closeAction}>
+        <DialogModel isOpen={isOpen} closeAction={closeAction} parent={parentRef?.current} >
           <CharacterDetailsDialog isOpen={isOpen} closeAction={closeAction} />
         </DialogModel>  
       )}
