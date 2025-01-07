@@ -1,4 +1,4 @@
-import { RefObject, useRef, useState } from "react";
+import { useState } from "react";
 import useFetchChineseCharacterTreeMaps from "../Hooks/UseFetchChineseCharacterTreeMaps";
 import CharacterTree from "./CharacterTree";
 import CharacterDetailsDialogContainer from "./CharacterDetailsDialogContainer";
