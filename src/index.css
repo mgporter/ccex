@@ -43,6 +43,11 @@ select:-webkit-autofill:focus {
   font-style: normal;
 }
 
+html {
+  height: 100%;
+  margin: 0;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -55,6 +60,13 @@ body {
   /* width: max-content; */
   background-color: #fafaf9;
 }
+
+@media (max-width: 1024px) {
+  body {
+    min-width: inherit;
+    width: 100%;
+  }
+} 
 
 input[type="checkbox"] {
   box-sizing: border-box;
@@ -75,6 +87,8 @@ input[type="checkbox"]:checked {
 #root {
   /* width: inherit;
   min-height: inherit; */
+  width: 100%;
+  height: 100%;
 }
 
 main {
@@ -86,18 +100,15 @@ main {
 .character-details-dialog {
   display: grid;
   grid-template-areas: 
-    ". cdd-ct" 
+    "cdd-hd cdd-hd"
     "cdd-as cdd-ct";
   grid-template-columns: 7rem auto;
-  grid-template-rows: 6rem auto;
+  grid-template-rows: auto;
 }
 
-@media (max-width: 1024px) {
-  body {
-    min-width: inherit;
-    width: 100%;
-  }
-} 
+.character-details-dialog .header {
+  grid-area: cdd-hd;
+}
 
 .character-details-dialog .content {
   grid-area: cdd-ct;
@@ -106,6 +117,7 @@ main {
 .character-details-dialog .aside {
   grid-area: cdd-as;
 }
+
 
 .loading-pulse {
   animation: loading-entrance 2s cubic-bezier(0.4, 0, 0.6, 1) 1s both, loading-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 3s infinite;

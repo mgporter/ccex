@@ -8,17 +8,12 @@ import { useCCEXStore } from "../Hooks/UseCCEXExplorerStore";
 import useSearchParamActions from "../Hooks/UseSearchParamActions";
 import AppInfoBox from "./AppInfoBox";
 
-interface ExplorerProps {
-  containerRef: RefObject<HTMLElement>;
-}
-
-export default function Explorer({ containerRef }: ExplorerProps) {
+export default function Explorer() {
 
   const { getSearchParamTreeMaps,  } = useSearchParamActions();
   const { treemapsLoading, treemapsError, treemapsData } = useFetchChineseCharacterTreeMaps(getSearchParamTreeMaps);
   const dialogOpenState = useState(false);
   const { showDerivatives } = useCCEXStore();
-  // const explorerRef = useRef<HTMLDivElement>(null!);
 
   const templateRows = treemapsData ? (showDerivatives ? 2 : 1) : 0;
 
@@ -26,11 +21,10 @@ export default function Explorer({ containerRef }: ExplorerProps) {
     <div 
       id="explorer"
       className="relative flex flex-col gap-8 justify-between pt-[210px] pb-[20px] z-1 w-fit min-w-full min-h-full
-        lg:self-center lg:pt-0 lg:gap-0 lg:min-h-[calc(100%-8rem)]">
+        lg:self-center lg:pt-0 lg:gap-0 lg:min-h-[calc(100%-12rem)]">
 
       <CharacterDetailsDialogContainer
-        isOpenState={dialogOpenState}
-        parentRef={containerRef} />
+        isOpenState={dialogOpenState} />
 
       <div id="explorer-row"
         className="relative grid px-[150px] gap-x-24 content-start items-start justify-center min-w-max

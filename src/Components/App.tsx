@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Explorer from "./Explorer";
 import Navigator from "./Navigator";
 import { preconnect } from "react-dom";
-import AppInfoBox from "./AppInfoBox";
+import { useCCEXStore } from "../Hooks/UseCCEXExplorerStore";
 
 export default function App() {
 
-  const ccexContainerRef = useRef<HTMLDivElement>(null!);
+  const { appContainer } = useCCEXStore();
 
   useEffect(() => {
     preconnect(import.meta.env.VITE_BACKEND_ADDR);
@@ -17,9 +17,9 @@ export default function App() {
     // Cannot use % units for this.
     <main id="ccex" className="relative h-screen w-screen border border-black
       lg:h-screen lg:w-screen">  
-      <div id="ccex-scrollview" ref={ccexContainerRef} className="flex flex-col w-full h-full overflow-auto">
+      <div id="ccex-scrollview" ref={appContainer} className="flex flex-col w-full h-full overflow-auto">
         <Navigator />
-        <Explorer containerRef={ccexContainerRef} />
+        <Explorer />
       </div>
     </main>
   )

@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 interface DialogModalProps extends React.PropsWithChildren {
   isOpen: boolean;
   closeAction: () => void;
-  parent?: HTMLElement;
+  container?: HTMLElement | null;
+  className?: string;
 }
 
-export default function DialogModel({ isOpen, closeAction, children, parent = document.body }: DialogModalProps) {
+export default function DialogModel({ isOpen, closeAction, children, className, container = document.body }: DialogModalProps) {
 
   function handleClose() {
     closeAction();
@@ -16,20 +17,19 @@ export default function DialogModel({ isOpen, closeAction, children, parent = do
   return (
     <>
       {isOpen && createPortal(
-        <div className="absolute inset-0 z-[2000]" role="dialog" aria-modal="true">
+        <div className="absolute inset-0 w-full h-full z-[2000]" role="dialog" aria-modal="true">
           <div className="absolute inset-0 bg-black/30" onClick={handleClose} aria-hidden="true" />
-          <div className="absolute inset-0 flex w-full items-center justify-center p-4 pointer-events-none
+          <div className="absolute inset-0 flex w-full h-full items-center justify-center p-4 pointer-events-none
             lg:p-0">
-            <div className="relative min-w-[500px] min-h-[300px] w-[80%] pointer-events-auto
-            bg-stone-100 rounded-lg border border-gray-500
-              lg:min-w-min lg:w-full lg:max-w-full lg:min-h-min">
+            <div className={"relative pointer-events-auto \
+            bg-stone-100 rounded-lg border border-gray-500 " + className}>
 
               {children}
 
             </div>
           </div>
         </div>,
-        parent || document.body
+        container || document.body
       )}
     </>
   )

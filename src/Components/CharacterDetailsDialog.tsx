@@ -1,6 +1,4 @@
 import { TradCharacterStub } from "../Api/types";
-import { useRef } from "react";
-import useScrollbarIsVisible from "../Hooks/UseScrollbarIsVisible";
 import { CharacterDetailsDialogCloseButton, CharacterDetailsInlineCloseButton } from "./CloseButton";
 
 import freq00 from '/frequency-meter/freq00.png';
@@ -17,6 +15,8 @@ import useCharacterDetailsContext from "../Hooks/UseCharacterDetailsContext";
 import { DetailsDialogCharacters } from "./ClickableCharacter";
 import { Button } from "@headlessui/react";
 import { ccexDispatcher } from "../Utils/CCEXDispatcher";
+import DynamicScrollDiv from "./DynamicScrollDiv";
+import { useCCEXStore } from "../Hooks/UseCCEXExplorerStore";
 
 const frequencyMeterUrls: Record<number, string> = {
   0: freq00,
@@ -38,27 +38,33 @@ interface CharacterDetailsProps {
 
 export default function CharacterDetailsDialog({ closeAction }: CharacterDetailsProps) {
 
-  const { data } = useCharacterDetailsContext();
-  const contentRef = useRef<HTMLDivElement | null>(null); // nullable, since the content div is conditionally rendered
-  const scrollbarIsVisible = useScrollbarIsVisible(contentRef, data);
+  const { appContainer } = useCCEXStore();
 
   return (
-    <div className="character-details-dialog gap-4 p-2">
+    <div className="character-details-dialog gap-4">
       <LargeCharDisplayWidget size={128} styles="absolute top-[-20px] left-[-20px]" />
 
-      <CharacterDetailsDialogCloseButton 
-        callback={closeAction} 
-        styles={`absolute top-2 px-[6px] ${scrollbarIsVisible ? "right-6" : "right-2"}`} />
-
-      <div ref={contentRef} className="content max-h-[80vh] overflow-y-auto p-2 pb-6">
+      <div className="header flex items-center flex-wrap gap-4 bg-gradient-to-r from-slate-300 to-transparent
+        pl-32 mt-4 py-2">
         <PinyinWidget />
-        <MainContentWidget />
+        <div className="grow">
+          <ComponentTreeButton />
+        </div>
+        <CharacterDetailsDialogCloseButton 
+          callback={closeAction} 
+          className="size-8 rounded-full mr-4"
+          xClassName="size-5" />
       </div>
 
-      <div className="aside flex flex-col gap-6 pb-4">
+      <div className="aside flex flex-col gap-6 pb-4 pt-12 ml-4">
         <FrequencyWidget />
         <TraditionalCharsWidget />
       </div>
+
+      <DynamicScrollDiv container={appContainer.current} maxHeightPercent={60} className="content mb-4 pr-2 mr-2 overflow-y-auto">
+        <MainContentWidget />
+      </DynamicScrollDiv>
+
     </div>
   )
 }
@@ -68,7 +74,7 @@ export function CharacterDetailsInline({ isOpen, closeAction }: CharacterDetails
   return (
     <aside className={`character-details-inline flex flex-col w-full px-2 py-8 bg-slate-200 border-y border-slate-400
       ${isOpen ? "" : "hidden"}`}>
-      <div className="flex justify-evenly items-start">
+      <div className="flex justify-evenly items-start ">
 
         <div className="flex flex-col items-center">
           <LargeCharDisplayWidget size={96} />
@@ -80,12 +86,16 @@ export function CharacterDetailsInline({ isOpen, closeAction }: CharacterDetails
 
       </div>
 
-      <MainContentWidget />
+      <div className="flex self-center gap-4 mt-4 w-full flex-wrap">
+        <ComponentTreeButton styles="self-center grow" />
+        <CharacterDetailsInlineCloseButton 
+          callback={closeAction} 
+          className="h-full rounded-md shadow-sm grow"
+          xClassName="size-4"
+        />
+      </div>
 
-      <CharacterDetailsInlineCloseButton 
-        callback={closeAction} 
-        styles="w-full mt-12 h-12"
-      />
+      <MainContentWidget />
 
     </aside>
   )
@@ -119,13 +129,6 @@ function MainContentWidget() {
   if (data) {
     return (
       <>
-        <Button onClick={() => ccexDispatcher.dispatch("showCharTree", { chars: data.char })}
-          className="border border-stone-400 bg-stone-200 shadow-sm mt-4 ml-[-2px] px-2 py-[2px]
-          rounded-md hover:bg-stone-300 transition-colors
-          active:bg-stone-400">
-          Show component tree for this character
-        </Button>
-
         <div className="mb-2 mt-6 font-semibold">
           <h3>Meaning: {data.definition}</h3>
             {data.base && <h4>This character is a variant of {data.base.char}</h4>}
@@ -220,13 +223,13 @@ function PinyinWidget({ styles }: { styles?: string }) {
 
   return (
     <>
-      {loading && <div className="h-[2.2rem] w-[6rem] bg-gray-200 rounded-md"></div>}
+      {loading && <div className="loading-pulse h-[2.2rem] w-[6rem] bg-gray-200 rounded-md"></div>}
       {(error || notFound) && <div className="h-[2.2rem] w-[6rem]"></div>}
       {data && (
-        <h2 className={"text-3xl font-bold mb-1 " + styles}>
+        <p className={"text-3xl font-bold leading-1 " + styles}>
           {info.hasPrimaryPinyin ? data.primaryPinyin.join(", ") : <span className="italic font-normal text-xl">No pronunciation</span>} 
           {info.hasSecondaryPinyin && ` (also ${data.secondaryPinyin.join(", ")})`}
-        </h2>
+        </p>
       )}
     </>
   )
@@ -247,5 +250,24 @@ function LargeCharDisplayWidget({ size, styles }: { size:number, styles?: string
         fontSize: `${size / 25}rem`,
       }}
     >{char}</div>    
+  )
+}
+
+
+function ComponentTreeButton({ styles }: { styles?: string }) {
+
+  const { data } = useCharacterDetailsContext();
+
+  return (
+    <Button onClick={() => ccexDispatcher.dispatch("showCharTree", { chars: data?.char })}
+    disabled={data === null}
+    className={"flex gap-2 items-center justify-center font-sans text-sm \
+    border border-stone-400 shadow-sm px-2 py-[2px] bg-stone-50 \
+    rounded-md hover:bg-stone-200 transition-colors \
+    active:bg-stone-400 \
+    lg:text-lg  " + styles}>
+      <img src="character-tree-icon.png" className="inline h-4"/>
+      show component tree
+    </Button>
   )
 }
