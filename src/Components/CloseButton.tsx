@@ -17,7 +17,7 @@ export function CloseButton({ callback, className, xClassName }: CloseButtonProp
         xmlns="http://www.w3.org/2000/svg">
         <path
           d="M 38.409207,38.606352 2.4548175,2.4404616 m 0,36.1658904 L 38.409207,2.4404616"
-          stroke-width="6" />
+          strokeWidth="6" />
       </svg>
     </Button>
   )
