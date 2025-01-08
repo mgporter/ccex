@@ -1,4 +1,6 @@
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useCCEXStore } from "../Hooks/UseCCEXExplorerStore";
 
 interface DialogModalProps extends React.PropsWithChildren {
   isOpen: boolean;
@@ -8,6 +10,13 @@ interface DialogModalProps extends React.PropsWithChildren {
 }
 
 export default function DialogModel({ isOpen, closeAction, children, className, container = document.body }: DialogModalProps) {
+
+  // const dialogRef = useRef<HTMLDivElement>(null!);
+  const { setModelIsVisible } = useCCEXStore();
+
+  useEffect(() => {
+    setModelIsVisible(isOpen);
+  }, [isOpen, setModelIsVisible])
 
   function handleClose() {
     closeAction();

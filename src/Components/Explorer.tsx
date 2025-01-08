@@ -25,8 +25,9 @@ export default function Explorer() {
     <DragScrollDiv 
       id="explorer"
       container={appContainer}
-      className="relative flex flex-col gap-8 justify-between pt-[210px] pb-[20px] z-1 w-fit min-w-full min-h-full
-        lg:self-center lg:pt-0 lg:gap-0 lg:min-h-[calc(100%-12rem)] cursor-grab">
+      className="relative flex flex-col gap-8 justify-between pt-[210px] pb-[120px] z-1
+        w-fit min-w-full min-h-full h-[800px]
+        lg:self-center lg:pt-0 lg:gap-0 lg:min-h-[calc(100%-12rem)]">
 
       <CharacterDetailsDialogContainer
         isOpenState={dialogOpenState} />

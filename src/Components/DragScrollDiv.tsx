@@ -1,4 +1,5 @@
-import { RefObject, useRef } from "react";
+import { RefObject, useState } from "react";
+import { useCCEXStore } from "../Hooks/UseCCEXExplorerStore";
 
 interface DragScrollDivProps extends React.HTMLAttributes<HTMLDivElement> {
   container: RefObject<HTMLElement | null>;
@@ -6,22 +7,23 @@ interface DragScrollDivProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export default function DragScrollDiv({ container, ...props }: DragScrollDivProps) {
 
-  const mousedown = useRef(false);
+  const [mousedown, setMouseDown] = useState(false);
+  const { modalIsVisible } = useCCEXStore();
 
   function onMouseDown(e: React.MouseEvent<HTMLDivElement>) {
-    if (e.button === 0) {
-      mousedown.current = true;
+    if (e.button === 0 && !modalIsVisible) {
+      setMouseDown(true);
     }
   }
 
   function onMouseUp(e: React.MouseEvent<HTMLDivElement>) {
     if (e.button === 0) {
-      mousedown.current = false;
+      setMouseDown(false);
     }
   }
 
   function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    if (!mousedown.current) return;
+    if (!mousedown) return;
 
     // The container has to be present, otherwise this
     // element will not be rendered.
@@ -35,6 +37,8 @@ export default function DragScrollDiv({ container, ...props }: DragScrollDivProp
   return (
     <div
       {...props}
+      className={"cursor-grab data-[indrag=true]:cursor-grabbing " + props.className}
+      data-indrag={mousedown}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
