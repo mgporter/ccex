@@ -1,10 +1,8 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { HTMLAttributes, useLayoutEffect, useRef, useState } from "react";
 
-interface DynamicScrollDivProps {
-  className?: string;
+interface DynamicScrollDivProps extends HTMLAttributes<HTMLDivElement> {
   container?: HTMLElement | null;
   maxHeightPercent?: number;
-  children?: React.ReactNode | undefined;
 }
 
 /** 
@@ -19,7 +17,7 @@ interface DynamicScrollDivProps {
  * It is not necessary to set any other height on this
  * element other than the maxHeightPercent.
 */
-export default function DynamicScrollDiv({ className, children, maxHeightPercent = 100, container = document.body }: DynamicScrollDivProps) {
+export default function DynamicScrollDiv({ maxHeightPercent = 100, container = document.body, ...props }: DynamicScrollDivProps) {
 
   const [contentHeight, setContentHeight] = useState("");
   const contentRef = useRef<HTMLDivElement>(null!);
@@ -45,8 +43,8 @@ export default function DynamicScrollDiv({ className, children, maxHeightPercent
   }, [container, maxHeightPercent])
 
   return (
-    <div ref={contentRef} className={className} style={{ height: contentHeight }}>
-      {children}
+    <div {...props} ref={contentRef} style={{ ...props.style, height: contentHeight }}>
+      {props.children}
     </div>
   )
 }

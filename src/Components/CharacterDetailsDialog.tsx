@@ -51,7 +51,7 @@ export default function CharacterDetailsDialog({ closeAction }: CharacterDetails
           <ComponentTreeButton />
         </div>
         <CharacterDetailsDialogCloseButton 
-          callback={closeAction} 
+          onClick={closeAction} 
           className="size-8 rounded-full mr-4"
           xClassName="size-5" />
       </div>
@@ -89,7 +89,7 @@ export function CharacterDetailsInline({ isOpen, closeAction }: CharacterDetails
       <div className="flex self-center gap-4 mt-4 w-full flex-wrap">
         <ComponentTreeButton styles="self-center grow" />
         <CharacterDetailsInlineCloseButton 
-          callback={closeAction} 
+          onClick={closeAction} 
           className="h-full rounded-md shadow-sm grow"
           xClassName="size-4"
         />

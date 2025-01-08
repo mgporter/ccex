@@ -7,6 +7,7 @@ import React from "react";
 import { useCCEXStore } from "../Hooks/UseCCEXExplorerStore";
 import useSearchParamActions from "../Hooks/UseSearchParamActions";
 import AppInfoBox from "./AppInfoBox";
+import DragScrollDiv from "./DragScrollDiv";
 
 export default function Explorer() {
 
@@ -17,11 +18,15 @@ export default function Explorer() {
 
   const templateRows = treemapsData ? (showDerivatives ? 2 : 1) : 0;
 
+  const { appContainer } = useCCEXStore();
+
+
   return (
-    <div 
+    <DragScrollDiv 
       id="explorer"
+      container={appContainer}
       className="relative flex flex-col gap-8 justify-between pt-[210px] pb-[20px] z-1 w-fit min-w-full min-h-full
-        lg:self-center lg:pt-0 lg:gap-0 lg:min-h-[calc(100%-12rem)]">
+        lg:self-center lg:pt-0 lg:gap-0 lg:min-h-[calc(100%-12rem)] cursor-grab">
 
       <CharacterDetailsDialogContainer
         isOpenState={dialogOpenState} />
@@ -48,6 +53,6 @@ export default function Explorer() {
 
       <AppInfoBox />
 
-    </div>
+    </DragScrollDiv>
   )
 }

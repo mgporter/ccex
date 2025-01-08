@@ -1,18 +1,18 @@
 import { Button } from "@headlessui/react";
+import { ButtonHTMLAttributes } from "react";
 
-interface CloseButtonProps {
-  callback: () => void;
-  className?: string;
+interface CloseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   xClassName?: string;
 }
 
-export function CloseButton({ callback, className, xClassName }: CloseButtonProps) {
+export function CloseButton({ xClassName, ...props }: CloseButtonProps) {
   return (
     <Button 
-      className={"flex justify-center items-center select-none cursor-pointer leading-none " + className}
-      onClick={callback}>
+      {...props}
+      className={"flex justify-center items-center select-none cursor-pointer leading-none " + props.className}
+    >
       <svg
-        className={"" + xClassName}
+        className={xClassName}
         viewBox="0 0 40.864025 40.864025"
         xmlns="http://www.w3.org/2000/svg">
         <path
@@ -23,23 +23,23 @@ export function CloseButton({ callback, className, xClassName }: CloseButtonProp
   )
 }
 
-export function CharacterDetailsInlineCloseButton({ callback, className, xClassName }: CloseButtonProps) {
+export function CharacterDetailsInlineCloseButton({ xClassName, ...props }: CloseButtonProps) {
   return (
     <CloseButton 
+      {...props}
       xClassName={"stroke-black " + xClassName}
-      callback={callback}
       className={"bg-violet-200 border border-slate-500 \
-        hover:bg-violet-300 transition-colors active:bg-violet-400 " + className} />
+        hover:bg-violet-300 transition-colors active:bg-violet-400 " + props.className} />
   )
 }
 
-export function CharacterDetailsDialogCloseButton({ callback, className, xClassName }: CloseButtonProps) {
+export function CharacterDetailsDialogCloseButton({ xClassName, ...props }: CloseButtonProps) {
   return (
-    <CloseButton 
-      callback={callback}
+    <CloseButton
+      {...props}
       xClassName={"stroke-black active:stroke-white " + xClassName}
       className={"border border-transparent transition-colors \
         hover:border-gray-500 hover:bg-orange-50 \
-        active:bg-red-500 " + className} />
+        active:bg-red-500 " + props.className} />
   )
 }
